@@ -1,0 +1,7 @@
+node_modules/
+dist/
+gifs/
+.idea
+package-lock.json
+yarn-error.log
+node_modulessssss/
