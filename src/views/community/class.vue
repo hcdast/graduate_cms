@@ -92,7 +92,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column align="center" label="最近登录时间" width="180">
+            <el-table-column align="center" label="最近登录时间" min-width="180">
                 <template slot-scope="scope">
                     <span>{{scope.row.gmtModified | timeFilter}}</span>
                 </template>
@@ -104,13 +104,13 @@
                 </template>
             </el-table-column>
 
-            <el-table-column align="center" label="学院" width="150">
+            <el-table-column align="center" label="学院" min-width="150">
                 <template slot-scope="scope">
                     <span>{{academyFilter(scope.row.academeId)}}</span>
                 </template>
             </el-table-column>
 
-            <el-table-column align="center" label="专业" width="150">
+            <el-table-column align="center" label="专业" min-width="150">
                 <template slot-scope="scope">
                     <span>{{majorFilter(scope.row.majorId)}}</span>
                 </template>

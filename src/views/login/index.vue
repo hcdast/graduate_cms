@@ -6,7 +6,7 @@
                          ref="loginForm"
                          label-position="left" style="text-align:center;">
                     <div style="text-align:center;margin-bottom:40px;">
-                        <img src="../../assets/logo.png" alt="logo">
+                        <img src="../../assets/logo.svg" alt="logo" style="width:76px;height:76px;">
                     </div>
                     <h3 class="title">安徽大学毕业生信息收集系统</h3>
 
@@ -49,8 +49,8 @@
                     password : ''
                 },
                 loginRules : {
-                    account : [ { required : true, trigger : 'blur' } ],
-                    password : [ { required : true, trigger : 'blur' } ]
+                    account : [ { required : true,  message: '请输入工号', trigger : 'blur' } ],
+                    password : [ { required : true,  message: '请输入密码',  trigger : 'blur' } ]
                 },
                 pwdType : 'password',
                 loading : false,

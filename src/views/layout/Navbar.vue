@@ -1,9 +1,10 @@
 <template>
     <el-menu class="navbar" mode="horizontal">
+        <div class="part1">
         <!-- 控件侧边栏的收缩 -->
         <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
         <levelbar></levelbar>
-        <tabs-view></tabs-view>
+
 
         <el-dropdown class="avatar-container" trigger="click">
             <span class="welcome">欢迎您！{{realName}} {{roles | rolesFilter}}</span>
@@ -23,6 +24,10 @@
                 </el-dropdown-menu>
             </el-dropdown>
         </el-dropdown>
+        </div>
+        <div class="part2">
+        <tabs-view></tabs-view>
+        </div>
     </el-menu>
 </template>
 
@@ -88,8 +93,8 @@
         @include colorBtn($blue)
         }
     .navbar {
-        height: 50px;
-        line-height: 50px;
+        // height: 50px;
+        // line-height: 50px;
         border-radius: 0px !important;
         .welcome{
             font-size: 18px;
@@ -102,7 +107,11 @@
             color: #0A56C4;
             }
         }
-
+        .part1{
+            border-bottom:1px solid rgba(0, 0, 0, 0.1);
+            height: 50px;
+            line-height:50px;
+        }
 
         .hamburger-container {
             line-height: 58px;
@@ -142,6 +151,10 @@
                     font-size: 12px;
                 }
             }
+        }
+        .part2{
+            height: 32px;
+            line-height: 30px;
         }
     }
 </style>

@@ -9,7 +9,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column align="center" label="登录账号" min-width="180">
+            <el-table-column align="center" label="登录账号" width="180">
                 <template slot-scope="scope">
                     <span>{{scope.row.account}}</span>
                 </template>
@@ -28,13 +28,13 @@
             </el-table-column>
 
 
-            <el-table-column align="center" label="最近登录时间" width="230">
+            <el-table-column align="center" label="最近登录时间" min-width="230">
                 <template slot-scope="scope">
                     <span>{{scope.row.gmtModified | timeFilter}}</span>
                 </template>
             </el-table-column>
 
-            <el-table-column class-name="status-col" label="类型" width="150">
+            <el-table-column class-name="status-col" label="类型" min-width="150">
                 <template slot-scope="scope">
                     <span>{{scope.row.authority | authorityFilter }}</span>
                 </template>

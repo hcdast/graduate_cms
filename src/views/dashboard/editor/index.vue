@@ -26,12 +26,12 @@
             </el-col>
 
         </el-row> -->
-        <div style="margin-bottom:140px;width:100%;height:1px;background-color: rgba(0, 0, 0, 0.1)"></div>
+        <!-- <div style="margin-bottom:120px;width:100%;height:1px;background-color: rgba(0, 0, 0, 0.1)"></div> -->
 
-        <el-row class="content">
+        <el-row class="content" style="margin-bottom:80px;">
             <el-col>
                 <div class="name">欢迎使用安徽大学毕业生信息收集系统</div>
-                <img src="../../../assets/ahdx.jpg" alt="" class="schoolLogo">
+                <img src="../../../assets/login.svg" alt="" class="schoolLogo" style="width:70%;">
             </el-col>
         </el-row>
 

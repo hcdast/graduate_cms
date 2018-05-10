@@ -1,14 +1,6 @@
 <template>
 <div>
     <div class="filter-container">
-        <div class="choose">
-            <el-select clearable style="width: 200px" class="filter-item" v-model="filename" placeholder="必须选择表名才可以打印">
-                <el-option v-for="item in exForm" :key="item.key" :label="item.key" :value="item.val">
-                </el-option>
-            </el-select>
-            <el-button class="filter-item" type="primary" @click="handleDownload" :loading="downloadLoading">打印已选</el-button>
-            <el-button class="filter-item" type="primary" @click="handleDownloadAll" :loading="downloadLoading">打印所有</el-button>
-        </div>
         <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
             <el-option v-for="item in academys" :key="item.key" :label="item.key" :value="item.val">
             </el-option>
@@ -30,9 +22,21 @@
         <el-button class="filter-item" type="primary"  icon="search" @click="getForm" >搜索</el-button>
         <div class="button-gr" v-if="role && role == 3">
             <el-button class="filter-item" type="primary" @click="upToAcademy">已选上报院系</el-button>
-            <el-button class="filter-item" type="primary" @click="upToAcademyAll">全部上报院系</el-button>
+            <!-- <el-button class="filter-item" type="primary" @click="upToAcademyAll">全部上报院系</el-button> -->
         </div>
     </div>
+    <div class="choose">
+            <el-select clearable style="width: 200px" class="filter-item" v-model="filename" placeholder="必须选择表名才可以打印">
+                <el-option v-for="item in exForm" :key="item.key" :label="item.key" :value="item.val">
+                </el-option>
+            </el-select>
+            <el-button class="filter-item" type="primary" @click="handleDownload" :loading="downloadLoading">打印已选</el-button>
+            <el-button class="filter-item" type="primary" @click="handleDownloadAll" :loading="downloadLoading">打印所有</el-button>
+            <div class="button-gr" v-if="role && role == 3">
+            <!-- <el-button class="filter-item" type="primary" @click="upToAcademy">已选上报院系</el-button> -->
+            <el-button class="filter-item" type="primary" @click="upToAcademyAll">全部上报院系</el-button>
+            </div>
+            </div>
     <el-table :data="tab3" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" ref="multipleTable">
 
     <el-table-column align="center" label="序号" width="80px">
@@ -583,7 +587,7 @@ export default {
   }
   .choose{
       position: relative;
-      text-align: right;
+      text-align: left;
       margin-bottom: 10px;
   }
   .filter-item{
