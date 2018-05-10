@@ -329,11 +329,11 @@ export default {
             this.multipleSelection.forEach(element => {
                 for(var i=0;i<this.majors.length;i++){
                     if(this.majors[i].val === element.majorId){
-                        return element.majorname = this.majors[i].key
+                        return element.majorname = this.majors[i].key;
                     }
                 }
-                return
-            })
+                return;
+            });
             // 遍历出性别
             this.multipleSelection.forEach(element => {
                 element.sexname = element.sex == 1 ? '女' : element.sex == 0 ? '男' : '未知'
@@ -349,34 +349,34 @@ export default {
             // 遍历有无学籍表
             this.multipleSelection.forEach(element => {
                 element.schoolformname = element.isSchoolForm == 1 ? '有' : element.isSchoolForm == 2 ? '无' : '待填写'
-            })
+            });
             this.downloadLoading = true;
             if(this.filename == '打印分会审批一览表'){
                 import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = ['学号', '姓名', '性别', '专业']
-                const filterVal = ['account', 'realName', 'sexname', 'majorname']
-                const list = this.multipleSelection
-                const data = this.formatJson(filterVal, list)
+                const tHeader = ['学号', '姓名', '性别', '专业'];
+                const filterVal = ['account', 'realName', 'sexname', 'majorname'];
+                const list = this.multipleSelection;
+                const data = this.formatJson(filterVal, list);
                 excel.export_json_to_excel({
                     header: tHeader,
                     data,
                     filename: this.filename
-                })
-                this.$refs.multipleTable.clearSelection()
+                });
+                this.$refs.multipleTable.clearSelection();
                 this.downloadLoading = false
                 })
             } else if(this.filename == '打印毕业一览表') {
                 import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = ['学号', '姓名', '专业', '毕业结论','是否授予学士','有无学籍表']
-                const filterVal = ['account', 'realName', 'majorname', 'graclusionname', 'degreename', 'schoolformname']
-                const list = this.multipleSelection
-                const data = this.formatJson(filterVal, list)
+                const tHeader = ['学号', '姓名', '专业', '毕业结论','是否授予学士','有无学籍表'];
+                const filterVal = ['account', 'realName', 'majorname', 'graclusionname', 'degreename', 'schoolformname'];
+                const list = this.multipleSelection;
+                const data = this.formatJson(filterVal, list);
                 excel.export_json_to_excel({
                     header: tHeader,
                     data,
                     filename: this.filename
-                })
-                this.$refs.multipleTable.clearSelection()
+                });
+                this.$refs.multipleTable.clearSelection();
                 this.downloadLoading = false
                 })
             }
@@ -390,28 +390,28 @@ export default {
 
     // 通过方法将id转为名称
     academyFilter(academeId){
-        for(var i=0;i<this.academys.length;i++){
+        for(let i=0;i<this.academys.length;i++){
             if(this.academys[i].val === academeId){
                 return this.academys[i].key
             }
         }
-        return
+        return '';
     },
     majorFilter(majorId){
-        for(var i=0;i<this.majors.length;i++){
+        for(let i=0;i<this.majors.length;i++){
             if(this.majors[i].val === majorId){
                 return this.majors[i].key
             }
         }
-        return
+        return '';
     },
     classesFilter(classId){
-        for(var i=0;i<this.classes.length;i++){
+        for(let i=0;i<this.classes.length;i++){
             if(this.classes[i].val === classId){
                 return this.classes[i].key
             }
         }
-        return
+        return '';
     },
     handleSizeChange(){
         this.getForm()
@@ -420,7 +420,7 @@ export default {
         this.getForm()
     },
     handleSelectionChange(val) {
-      this.multipleSelection = val
+      this.multipleSelection = val;
       console.log(val)
     },
     // 全选
@@ -464,7 +464,7 @@ export default {
                                         location.reload()
                                 }
                     }
-             })
+             });
              resolve()
         })
                         }
