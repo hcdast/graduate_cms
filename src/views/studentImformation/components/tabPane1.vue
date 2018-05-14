@@ -200,7 +200,7 @@ export default {
     getForm(){
         return new Promise( resolve => {
             getStudentListParam(this.searchList).then( (res) => {
-                if(res.status!=200) {
+                if(res.status != 200) {
                     this.$message.error('请求失败，网络原因请重试！');
                 }else {
                         if(!res.data||res.data.code !=0){
@@ -346,6 +346,10 @@ export default {
             this.multipleSelection.forEach(element => {
                 element.degreename = element.isDegree == 1 ? '拟授予' : element.isDegree == 2 ? '拟不授予' : '待填写'
             })
+            //加入原因
+            this.multipleSelection.forEach(element => {
+                element.reason = '符合“校政（2008）1号”第六条第  款的规定'
+            })
             // 遍历有无学籍表
             this.multipleSelection.forEach(element => {
                 element.schoolformname = element.isSchoolForm == 1 ? '有' : element.isSchoolForm == 2 ? '无' : '待填写'
@@ -353,8 +357,8 @@ export default {
             this.downloadLoading = true;
             if(this.filename == '打印分会审批一览表'){
                 import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = ['学号', '姓名', '性别', '专业'];
-                const filterVal = ['account', 'realName', 'sexname', 'majorname'];
+                const tHeader = ['序号', '学号', '姓名', '性别', '专业', '不授予原因', '学生签字', '分会主任签字'];
+                const filterVal = ['id', 'account', 'realName', 'sexname', 'majorname', 'reason', 'studentsign', 'acadesign'];
                 const list = this.multipleSelection;
                 const data = this.formatJson(filterVal, list);
                 excel.export_json_to_excel({
@@ -367,11 +371,13 @@ export default {
                 })
             } else if(this.filename == '打印毕业一览表') {
                 import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = ['学号', '姓名', '专业', '毕业结论','是否授予学士','有无学籍表'];
-                const filterVal = ['account', 'realName', 'majorname', 'graclusionname', 'degreename', 'schoolformname'];
+                const tTitle = ['院系（印章）', '', '领导签字', '', '填表人','',' 年 月 日', ''];
+                const tHeader = ['序号', '学号', '姓名', '专业', '毕业结论','是否授予学士','有无学籍表', '备注'];
+                const filterVal = ['id', 'account', 'realName', 'majorname', 'graclusionname', 'degreename', 'schoolformname','detailmessage'];
                 const list = this.multipleSelection;
                 const data = this.formatJson(filterVal, list);
                 excel.export_json_to_excel({
+                    title:tTitle,
                     header: tHeader,
                     data,
                     filename: this.filename
@@ -421,7 +427,11 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      console.log(val)
+      for(var i =0;i<this.multipleSelection.length;i++){
+          // console.log(this.multipleSelection[i])
+          this.multipleSelection[i].id = i+1
+      }
+        console.log(this.multipleSelection)
     },
     // 全选
     getMessageToAcademyAll(){

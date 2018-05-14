@@ -3,20 +3,33 @@
         <div class="filter-container">
 
             <!-- 三级联动 -->
-            <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
-                <el-option v-for="item in academys" :key="item.key" :label="item.key" :value="item.val">
-                </el-option>
-            </el-select>
+            <span v-if="this.storeList.academeId == 0 || !this.storeList.academeId">
+                <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
+                    <el-option v-for="item in academys" :key="item.key" :label="item.key" :value="item.val">
+                    </el-option>
+                </el-select>
 
-            <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.majorId" placeholder="全部专业">
-                <el-option v-for="item in majors" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.academeId == item.acaid">
-                </el-option>
-            </el-select>
+                <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.majorId" placeholder="全部专业">
+                    <el-option v-for="item in majors" :key="item.key" :label="item.key" :value="item.val">
+                    </el-option>
+                </el-select>
 
-            <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.classId" placeholder="全部班级">
-                <el-option v-for="item in classes" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.majorId == item.majid">
-                </el-option>
-            </el-select>
+                <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.classId" placeholder="全部班级">
+                    <el-option v-for="item in classes" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.majorId == item.majid">
+                    </el-option>
+                </el-select>
+            </span>
+            <span v-else>
+                <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.majorId" placeholder="全部专业">
+                    <el-option v-for="item in majors" :key="item.key" :label="item.key" :value="item.val">
+                    </el-option>
+                </el-select>
+
+                <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.classId" placeholder="全部班级">
+                    <el-option v-for="item in classes" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.majorId == item.majid">
+                    </el-option>
+                </el-select>
+            </span>
 
             <el-input @keyup.enter.native="getClassAdmins" style="width: 200px;" class="filter-item" placeholder="搜索管理员名称" v-model="searchList.classAdminName">
             </el-input>
@@ -246,6 +259,9 @@
                     id:'',
                     isDeleted:''
                 },
+                storeList: {
+                    academeId:''
+                }
             }
         },
         filters : {
@@ -457,43 +473,73 @@
             }
         },
         created() {
-            function setAcademys () {
-                return new Promise((resolve,reject) => {
-                    getAcademys(academys => {
-                        resolve(academys)
+            this.storeList.academeId = this.academeIdOfStore;
+            if(this.storeList.academeId == 0 || !this.storeList.academeId){
+                function setAcademys () {
+                    return new Promise((resolve,reject) => {
+                        getAcademys(academys => {
+                            resolve(academys)
+                        })
                     })
-                })
-            };
-            function setMajors () {
-                return new Promise((resolve,reject) => {
-                    getMajors(majors => {
-                        resolve(majors)
+                };
+                function setMajors () {
+                    return new Promise((resolve,reject) => {
+                        getMajors(majors => {
+                            resolve(majors)
+                        })
                     })
-                })
-            };
-            function setClasses () {
-                return new Promise((resolve,reject) => {
-                   getClasses(classes => {
-                        resolve(classes)
+                };
+                function setClasses () {
+                    return new Promise((resolve,reject) => {
+                        getClasses(classes => {
+                            resolve(classes)
+                        })
                     })
+                };
+                setAcademys().then(academys => {
+                    this.academys = academys;
+                    return setMajors();
+                }).then(majors => {
+                    this.majors = majors;
+                    return setClasses();
+                }).then(classes => {
+                    this.classes = classes;
+                    this.getClassAdmins();
                 })
-            };
-            setAcademys().then(academys => {
-                this.academys = academys;
-                return setMajors();
-            }).then(majors => {
-                this.majors = majors;
-                return setClasses();
-            }).then(classes => {
-                this.classes = classes;
-                this.getClassAdmins();
-            })
+            }else {
+                function setMajors () {
+                    return new Promise((resolve,reject) => {
+                        getMajors(majors => {
+                            resolve(majors)
+                        })
+                    })
+                };
+                function setClasses () {
+                    return new Promise((resolve,reject) => {
+                        getClasses(classes => {
+                            resolve(classes)
+                        })
+                    })
+                };
+                setMajors().then(majors => {
+                    majors.forEach(element => {
+                        if(element.acaid == this.academeIdOfStore){
+                            this.majors.push(element)
+                        }
+                    });
+                    return setClasses();
+                }).then(classes => {
+                    this.classes = classes;
+                    this.getClassAdmins();
+                })
+            }
         },
         computed : {
             ...mapGetters ( [
                 'aid',
                 'init',
-                'realName'
+                'realName',
+                'academeIdOfStore'
             ] )
         },
     }

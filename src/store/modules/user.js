@@ -11,6 +11,7 @@ const user = {
         introduction : '',
         roles : [],
         schoolId: null,
+        academeIdOfStore:null,
         init: null,
 
     },
@@ -27,6 +28,9 @@ const user = {
         },
         SET_SCHOOLID : (state, schoolId) => {
             state.schoolId = schoolId
+        },
+        SET_ACADEMEIDOFSTORE : (state, academeIdOfStore) => {
+            state.academeIdOfStore = academeIdOfStore
         },
         SET_REALNAME: (state, realName) => {
             state.realName = realName
@@ -81,6 +85,7 @@ const user = {
                     commit ( 'SET_SCHOOLID', data[1].schoolId )
                     commit ( 'SET_REALNAME', data[1].realName )
                     commit ( 'SET_INIT', data[0].isInit )
+                    commit( 'SET_ACADEMEIDOFSTORE', data[1].academeId )
                     resolve ( response )
                 }).catch( error => {
                     reject( error )
