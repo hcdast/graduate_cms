@@ -235,6 +235,14 @@ export default {
           { val:'打印毕业一览表', key: '打印毕业一览表'},
           { val:'打印分会审批一览表', key: '打印分会审批一览表'},
       ],
+      allSelect:[],
+      exportData1: [],
+      exportData2: [],
+      wopts : {
+                bookType : 'xlsx',
+                bookSST : true,
+                type : 'binary'
+            }
     }
   },
   filters: {
@@ -400,6 +408,10 @@ export default {
                         }else{
                             this.allSelect = res.data.data;
                             if(this.allSelect.length) {
+                                for(var i =0;i<this.allSelect.length;i++){
+                                    // console.log(this.multipleSelection[i])
+                                    this.allSelect[i].id = i+1
+                                }
                                 // 遍历出专业名
                                 this.allSelect.forEach(element => {
                                     for(var i=0;i<this.majors.length;i++){
@@ -427,31 +439,85 @@ export default {
                                 })
                                 this.downloadLoading = true;
                                 if(this.filename == '打印分会审批一览表'){
-                                    import('@/vendor/Export2Excel').then(excel => {
-                                    const tHeader = ['学号', '姓名', '性别', '专业']
-                                    const filterVal = ['account', 'realName', 'sexname', 'majorname']
-                                    const list = this.allSelect
-                                    const data = this.formatJson(filterVal, list)
-                                    excel.export_json_to_excel({
-                                        header: tHeader,
-                                        data,
-                                        filename: this.filename
-                                    })
-                                    // this.$refs.multipleTable.clearSelection()
+                                    this.allSelect.forEach(element =>{
+                                        let Excel2 = {
+                                                id: '',
+                                                account: '',
+                                                realName: '',
+                                                sexname: '',
+                                                majorname: '',
+                                                reason: '',
+                                                studentsign: '',
+                                                acadesign:'',
+                                            };
+                                        Excel2.id = element.id;
+                                        // console.log(element.id)
+                                        Excel2.account = element.account;
+                                        Excel2.realName = element.realName;
+                                        Excel2.majorname = element.majorname;
+                                        Excel2.reason = element.reason;
+                                        Excel2.sexname = element.sexname;
+                                        Excel2.studentsign = '';
+                                        Excel2.acadesign = '';
+                                        this.exportData2.push(Excel2)
+                                    });
+                                    import('@/vendor/ExportExcelForMy2').then(excel => {
+                                    this.exportData2.unshift({});
+                                    this.exportData2.unshift({});
+                                    this.exportData2.unshift({});
+                                    this.exportData2.unshift({});
+                                    this.exportData2.push({id:'说明：'});
+                                    this.exportData2.push({id:'《安徽大学普通教育本科生学士学位授予工作实施细则》（校政〔2008〕1号）规定：'});
+                                    this.exportData2.push({id:'“第六条  修业期间有下列情形之一者，不予授予学士学位：'});
+                                    this.exportData2.push({account:'一、违反国家法律受到刑事处罚；        二、违反校规受到记过及以上处分；'});
+                                    this.exportData2.push({account:'三、考试舞弊受到严重警告及以上处分；  四、修业期满，平均学分绩点低于1.5；'});
+                                    this.exportData2.push({account:'五、毕业论文（设计、创作）成绩不及格；六、修业期间，退学警告累计达到三次及以上的；'});
+                                    this.exportData2.push({account:'七、修业期满，仍未修满毕业最低要求学分”。'});
+                                    const data1 = this.exportData2;
+                                    const length = data1.length;
+                                    // console.log(data1.length)
+                                    excel.export_json_to_excel(
+                                        data1,
+                                        this.filename,
+                                        this.wopts,
+                                        length
+                                    );
+                                    this.$refs.multipleTable.clearSelection();
+                                    this.exportData2 = [];
                                     this.downloadLoading = false
                                     })
                                 } else if(this.filename == '打印毕业一览表') {
-                                    import('@/vendor/Export2Excel').then(excel => {
-                                    const tHeader = ['学号', '姓名', '专业', '毕业结论','是否授予学士','有无学籍表']
-                                    const filterVal = ['account', 'realName', 'majorname', 'graclusionname', 'degreename', 'schoolformname']
-                                    const list = this.allSelect
-                                    const data = this.formatJson(filterVal, list)
-                                    excel.export_json_to_excel({
-                                        header: tHeader,
-                                        data,
-                                        filename: this.filename
+                                    this.allSelect.forEach(element =>{
+                                        let Excel1 = {
+                                                id: '',
+                                                account: '',
+                                                realName: '',
+                                                majorname: '',
+                                                graclusionname: '',
+                                                degreename: '',
+                                                schoolformname:'',
+                                                detailmessage: ''
+                                            };
+                                        Excel1.id = element.id;
+                                        // console.log(element.id)
+                                        Excel1.account = element.account;
+                                        Excel1.realName = element.realName;
+                                        Excel1.majorname = element.majorname;
+                                        Excel1.graclusionname = element.graclusionname;
+                                        Excel1.degreename = element.degreename;
+                                        Excel1.schoolformname = element.schoolformname;
+                                        Excel1.detailmessage = '';
+                                        this.exportData1.push(Excel1)
                                     })
-                                    // this.$refs.multipleTable.clearSelection()
+                                    import('@/vendor/ExportExcelForMy1').then(excel => {
+                                    this.exportData1.unshift({})
+                                    this.exportData1.unshift({})
+                                    const data = this.exportData1;
+                                    excel.export_json_to_excel(
+                                        data,
+                                        this.filename,
+                                        this.wopts);
+                                    this.exportData1 = [];
                                     this.downloadLoading = false
                                     })
                                 }
@@ -468,6 +534,10 @@ export default {
     // 部分表格导出
     handleDownload(){
         if(this.multipleSelection.length) {
+            for(var i =0;i<this.multipleSelection.length;i++){
+                // console.log(this.multipleSelection[i])
+                this.multipleSelection[i].id = i+1
+            }
             // 遍历出专业名
             this.multipleSelection.forEach(element => {
                 for(var i=0;i<this.majors.length;i++){
@@ -489,37 +559,96 @@ export default {
             this.multipleSelection.forEach(element => {
                 element.degreename = element.isDegree == 1 ? '拟授予' : element.isDegree == 2 ? '拟不授予' : '待填写'
             })
+            //加入原因
+            this.multipleSelection.forEach(element => {
+                element.reason = '符合“校政（2008）1号”第六条第  款的规定'
+            })
             // 遍历有无学籍表
             this.multipleSelection.forEach(element => {
                 element.schoolformname = element.isSchoolForm == 1 ? '有' : element.isSchoolForm == 2 ? '无' : '待填写'
             })
             this.downloadLoading = true;
             if(this.filename == '打印分会审批一览表'){
-                import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = ['学号', '姓名', '性别', '专业']
-                const filterVal = ['account', 'realName', 'sexname', 'majorname']
-                const list = this.multipleSelection
-                const data = this.formatJson(filterVal, list)
-                excel.export_json_to_excel({
-                    header: tHeader,
-                    data,
-                    filename: this.filename
-                })
-                this.$refs.multipleTable.clearSelection()
-                this.downloadLoading = false
-                })
+                this.multipleSelection.forEach(element =>{
+                    let Excel2 = {
+                            id: '',
+                            account: '',
+                            realName: '',
+                            sexname: '',
+                            majorname: '',
+                            reason: '',
+                            studentsign: '',
+                            acadesign:'',
+                        };
+                        Excel2.id = element.id;
+                        // console.log(element.id)
+                        Excel2.account = element.account;
+                        Excel2.realName = element.realName;
+                        Excel2.majorname = element.majorname;
+                        Excel2.reason = element.reason;
+                        Excel2.sexname = element.sexname;
+                        Excel2.studentsign = '';
+                        Excel2.acadesign = '';
+                        this.exportData2.push(Excel2)
+                    });
+                    import('@/vendor/ExportExcelForMy2').then(excel => {
+                    this.exportData2.unshift({});
+                    this.exportData2.unshift({});
+                    this.exportData2.unshift({});
+                    this.exportData2.unshift({});
+                    this.exportData2.push({id:'说明：'});
+                    this.exportData2.push({id:'《安徽大学普通教育本科生学士学位授予工作实施细则》（校政〔2008〕1号）规定：'});
+                    this.exportData2.push({id:'“第六条  修业期间有下列情形之一者，不予授予学士学位：'});
+                    this.exportData2.push({account:'一、违反国家法律受到刑事处罚；        二、违反校规受到记过及以上处分；'});
+                    this.exportData2.push({account:'三、考试舞弊受到严重警告及以上处分；  四、修业期满，平均学分绩点低于1.5；'});
+                    this.exportData2.push({account:'五、毕业论文（设计、创作）成绩不及格；六、修业期间，退学警告累计达到三次及以上的；'});
+                    this.exportData2.push({account:'七、修业期满，仍未修满毕业最低要求学分”。'});
+                    const data1 = this.exportData2;
+                    const length = data1.length;
+                    // console.log(data1.length)
+                    excel.export_json_to_excel(
+                        data1,
+                        this.filename,
+                        this.wopts,
+                        length
+                    );
+                    this.$refs.multipleTable.clearSelection();
+                    this.exportData2 = [];
+                    this.downloadLoading = false
+                    })
             } else if(this.filename == '打印毕业一览表') {
-                import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = ['学号', '姓名', '专业', '毕业结论','是否授予学士','有无学籍表']
-                const filterVal = ['account', 'realName', 'majorname', 'graclusionname', 'degreename', 'schoolformname']
-                const list = this.multipleSelection
-                const data = this.formatJson(filterVal, list)
-                excel.export_json_to_excel({
-                    header: tHeader,
-                    data,
-                    filename: this.filename
+                this.multipleSelection.forEach(element =>{
+                    let Excel1 = {
+                            id: '',
+                            account: '',
+                            realName: '',
+                            majorname: '',
+                            graclusionname: '',
+                            degreename: '',
+                            schoolformname:'',
+                            detailmessage: ''
+                        };
+                    Excel1.id = element.id;
+                    // console.log(element.id)
+                    Excel1.account = element.account;
+                    Excel1.realName = element.realName;
+                    Excel1.majorname = element.majorname;
+                    Excel1.graclusionname = element.graclusionname;
+                    Excel1.degreename = element.degreename;
+                    Excel1.schoolformname = element.schoolformname;
+                    Excel1.detailmessage = '';
+                    this.exportData1.push(Excel1)
                 })
-                this.$refs.multipleTable.clearSelection()
+                import('@/vendor/ExportExcelForMy1').then(excel => {
+                this.exportData1.unshift({})
+                this.exportData1.unshift({})
+                const data = this.exportData1;
+                excel.export_json_to_excel(
+                    data,
+                    this.filename,
+                    this.wopts);
+                this.$refs.multipleTable.clearSelection();
+                this.exportData1 = [];
                 this.downloadLoading = false
                 })
             }
