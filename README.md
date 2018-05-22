@@ -14,5 +14,7 @@ npm run dev
 
 # build for production with minification
 npm run build:prod
+
+具体的修改步骤和之前的代码样式看coding
 ```
 
