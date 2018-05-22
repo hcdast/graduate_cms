@@ -59,7 +59,7 @@
             }
         },
         methods : {
-            showPwd () {
+            showPwd() {
                 if (this.pwdType === 'password') {
                     this.pwdType = ''
                 } else {

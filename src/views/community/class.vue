@@ -31,6 +31,7 @@
                 </el-select>
             </span>
 
+
             <el-input @keyup.enter.native="getClassAdmins" style="width: 200px;" class="filter-item" placeholder="搜索管理员名称" v-model="searchList.classAdminName">
             </el-input>
 
@@ -53,6 +54,7 @@
                 <el-form-item label="手机号" label-width="100px" prop="phone">
                     <el-input v-model="addForm.phone"></el-input>
                 </el-form-item>
+                <span v-if="this.storeList.academeId == 0 || !this.storeList.academeId">
                 <el-form-item label="所属学院" label-width="100px" prop="academeId">
                     <el-select v-model="addForm.academeId" placeholder="请选择">
                         <el-option v-for="item in academys" :key="item.key" :label="item.key" :value="item.val"></el-option>
@@ -68,6 +70,19 @@
                         <el-option v-for="item in classes" :key="item.key" :label="item.key" :value="item.val" v-if="addForm.majorId == item.majid" ></el-option>
                     </el-select>
                 </el-form-item>
+                </span>
+                <span v-else>
+                <el-form-item label="所属专业" label-width="100px" prop="majorId">
+                    <el-select v-model="addForm.majorId" placeholder="请选择">
+                        <el-option v-for="item in majors" :key="item.key" :label="item.key" :value="item.val"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="所属班级" label-width="100px" prop="classId">
+                    <el-select v-model="addForm.classId" placeholder="请选择">
+                        <el-option v-for="item in classes" :key="item.key" :label="item.key" :value="item.val" v-if="addForm.majorId == item.majid" ></el-option>
+                    </el-select>
+                </el-form-item>
+                </span>
                 <el-form-item label="操作人" label-width="100px">
                     <el-input v-model="addForm.createdMen" disabled></el-input>
                 </el-form-item>
@@ -79,7 +94,7 @@
 
         </el-dialog>
 
-        <el-table  :data="classs" element-loading-text="正在努力加载中......" border fit highlight-current-row style="width: 100%">
+        <el-table  :data="pagingData" element-loading-text="正在努力加载中......" border fit highlight-current-row style="width: 100%">
 
             <el-table-column align="center" label="序号" width="70px">
                 <template slot-scope="scope">
@@ -153,7 +168,7 @@
 
         <div v-show="!listLoading" class="pagination-container">
             <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="searchList.page"
-                            :page-size="searchList.size" layout="total, prev, pager, next, jumper" :total="total">
+                            :page-size="this.pagesize" layout="total, prev, pager, next, jumper" :total="total">
             </el-pagination>
         </div>
 
@@ -174,7 +189,7 @@
 </template>
 <script>
     import { mapGetters } from 'vuex'
-    import { getClassAdmin,createdAdmin, updateAdmin } from '../../newapi/community'
+    import { getClassAdmin,createdClassAdmin, updateClassAdmin } from '../../newapi/community'
     import { timestamp2normal } from '../../utils/index'
     import { getAcademys, getMajors, getClasses } from '../../filters/contentfilters'
     import { isvalidPhone } from '../../utils/validate'
@@ -244,7 +259,7 @@
                     id: null,
                     realName: '',
                     phone: '',
-                    size : 10,
+                    size : 10000,
                     page : 1,
                     academeId:'',
                     majorId:'',
@@ -256,12 +271,15 @@
                 majors:[],
                 classes:[],
                 deblockForm: {
-                    id:'',
+                    aid:'',
+                    classId:'',
                     isDeleted:''
                 },
                 storeList: {
                     academeId:''
-                }
+                },
+                pagingData:[],
+                pagesize: 10,
             }
         },
         filters : {
@@ -306,12 +324,18 @@
                 }
             },
             handleSubmit(formName){
+                if(this.academeIdOfStore == 0){
+                    console.log('教务管理员')
+                } else{
+                    this.addForm.academeId = this.academeIdOfStore;
+                }
+                console.log(this.addForm.academeId)
                 console.log(this.addForm)
                 this.$refs[formName].validate((valid) => {
                     if (valid){
-                        this.addFormVisible = false;
+                        // this.addFormVisible = false;
                         return new Promise( resolve => {
-                            createdAdmin(this.addForm).then( (res) => {
+                            createdClassAdmin(this.addForm).then( (res) => {
                                 if(res.status!= 200){
                                     this.$message.error('请求失败，网络原因请重试！');
                                 }else {
@@ -347,10 +371,16 @@
             },
 
             getClassAdmins(){
+                if(this.academeIdOfStore == 0) {
+                    // console.log(213)
+                }else {
+                    this.searchList.academeId = this.academeIdOfStore;
+                }
                 this.searchList.aid = this.aid;
                 if(this.init === 1){
                     this.initializeVisible = false;
                     getClassAdmin(this.searchList).then((res) => {
+                        // console.log(res)
                         if(res.status!= 200){
                             this.$message.error('请求失败，网络原因请重试！');
                         }else {
@@ -361,6 +391,7 @@
                                 if(this.searchList.page==1){
                                     this.total = parseInt(res.data.message);
                                 }
+                                this.sptypehand();
                                 this.listLoading = false;
                             }
                         }
@@ -376,10 +407,12 @@
                 this.getClassAdmins ();
             },
             handleBlocking( index, row ){
-                this.deblockForm.id = row.id;
+                this.deblockForm.aid = row.id;
+                this.deblockForm.classId = row.classId;
                 this.deblockForm.isDeleted = 1;
+                console.log(this.deblockForm)
                 return new Promise( resolve => {
-                    updateAdmin(this.deblockForm).then( (res) => {
+                    updateClassAdmin(this.deblockForm).then( (res) => {
                         if(res.status!= 200){
                             this.$message.error('请求失败，网络原因请重试！');
                         }else {
@@ -398,10 +431,11 @@
                 })
             },
             handleDeblocking(index,row ){
-                this.deblockForm.id = row.id;
+                this.deblockForm.aid = row.id;
+                this.deblockForm.classId = row.classId;
                 this.deblockForm.isDeleted = 0;
                 return new Promise( resolve => {
-                    updateAdmin(this.deblockForm).then( (res) => {
+                    updateClassAdmin(this.deblockForm).then( (res) => {
                         if(res.status!= 200){
                             this.$message.error('请求失败，网络原因请重试！');
                         }else {
@@ -420,30 +454,11 @@
                 })
 
             },
-            deblockConfirm(){
-                this.deblockVisible = true;
-                return new Promise(resolve => {
-                    let params = this.setBlockParams(0, this.deblockForm.id);
-                    updateUser(params).then((res) => {
-                        if(res.status!=200){
-                            this.$message.error('请求失败，网络原因请重试！');
-                        }else {
-                            if(res.data.code!=0){
-                                this.$message.error('请求错误，请刷新页面或联系开发人员');
-                            }else{
-                                this.deblockVisible = false;
-                                this.users[this.deblockIndex].isDeleted = 0
-                                this.$notify({
-                                    title: '成功',
-                                    message: `成功解封用户：${this.deblockForm.nickName}`,
-                                    type: 'success'
-                                });
-                                this.getUsers()
-                            }
-                        }
-                        resolve()
-                    })
-                })
+
+            // 手动分页
+            sptypehand(){
+               var offset = (this.searchList.page - 1)*this.pagesize;
+               this.pagingData = (offset + this.pagesize) >= this.classs.length ? this.classs.slice(offset, this.classs.length) : this.classs.slice(offset, offset + this.pagesize)
             },
 
              // 通过方法将id转为名称
@@ -491,7 +506,7 @@
                 };
                 function setClasses () {
                     return new Promise((resolve,reject) => {
-                        getClasses(classes => {
+                    getClasses(classes => {
                             resolve(classes)
                         })
                     })
@@ -507,6 +522,13 @@
                     this.getClassAdmins();
                 })
             }else {
+                function setAcademys () {
+                    return new Promise((resolve,reject) => {
+                        getAcademys(academys => {
+                            resolve(academys)
+                        })
+                    })
+                };
                 function setMajors () {
                     return new Promise((resolve,reject) => {
                         getMajors(majors => {
@@ -516,7 +538,7 @@
                 };
                 function setClasses () {
                     return new Promise((resolve,reject) => {
-                        getClasses(classes => {
+                    getClasses(classes => {
                             resolve(classes)
                         })
                     })
@@ -531,6 +553,9 @@
                 }).then(classes => {
                     this.classes = classes;
                     this.getClassAdmins();
+                })
+                setAcademys().then(academys => {
+                    this.academys = academys;
                 })
             }
         },

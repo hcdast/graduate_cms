@@ -116,16 +116,12 @@ export function export_table_to_excel(id) {
     saveAs(new Blob([s2ab(wbout)], {type: "application/octet-stream"}), "test.xlsx")
 }
 
-export function export_json_to_excel({title, header, data, filename='excel-list', autoWidth=true}={}) {
+export function export_json_to_excel({header, data, filename='excel-list', autoWidth=true}={}) {
     /* original data */
     data=[...data]
     data.unshift(header);
-    data.unshift(title);
-    // data = XLSX.utils.json_to_sheet(data);
-    console.log(data)
     var ws_name = "SheetJS";
     var wb = new Workbook(), ws = sheet_from_array_of_arrays(data);
-
 
     if(autoWidth){
       /*设置worksheet每列的最大宽度*/

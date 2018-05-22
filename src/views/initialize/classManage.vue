@@ -1,11 +1,18 @@
 <template>
     <div class="app-container calendar-list-container">
         <div class="filter-container">
-
-            <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
-                <el-option v-for="item in academys" :key="item.key" :label="item.key" :value="item.val">
-                </el-option>
-            </el-select>
+            <span v-if="this.role == 2">
+                <el-select disabled clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
+                    <el-option v-for="item in academys" :key="item.key" :label="item.key" :value="item.val">
+                    </el-option>
+                </el-select>
+            </span>
+            <span v-else>
+                <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
+                    <el-option v-for="item in academys" :key="item.key" :label="item.key" :value="item.val">
+                    </el-option>
+                </el-select>
+            </span>
 
             <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.majorId" placeholder="全部专业">
                 <el-option v-for="item in majors" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.academeId == item.acaid">
@@ -86,6 +93,7 @@
                 nowYear:{
                     year:''
                 },
+                role:''
             }
         },
 
@@ -104,6 +112,9 @@
             getClassMeaasges(){
                 this.searchList.aid = this.aid;
                 this.listLoading = true;
+                if(this.role == 2){
+                    this.searchList.academeId = this.academeIdOfStore;
+                }
                 return new Promise(resolve=> {
                    getClassMessage(this.searchList).then((res)=> {
                         if(res.status!= 200){
@@ -172,6 +183,7 @@
             },
         },
         created() {
+            this.role = this.roles[0];
             function setAcademys () {
                 return new Promise((resolve,reject) => {
                     getAcademys(academys => {
@@ -208,7 +220,9 @@
         computed: {
             ...mapGetters([
                 'aid',
-                'init'
+                'init',
+                'roles',
+                'academeIdOfStore',
             ])
         },
     }

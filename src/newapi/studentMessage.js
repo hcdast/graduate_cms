@@ -29,3 +29,15 @@ export const updateStudent = data => {
         data:data
     })
 };
+
+// 班级管理员获取学生
+export const getStudentListClass = params => {
+    return axios({
+        method: 'post',
+        url: `${baseURL}/student/getStudentByAdminClassList`,
+        headers: {
+            'Content-type': 'application/x-www-form-urlencoded'
+        },
+        params: params
+    })
+};

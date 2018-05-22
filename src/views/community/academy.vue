@@ -250,7 +250,7 @@
                 console.log(this.addForm)
                 this.$refs[formName].validate((valid) => {
                     if (valid){
-                        this.addFormVisible = false;
+                        // this.addFormVisible = false;
                         return new Promise( resolve => {
                             createdAdmin(this.addForm).then( (res) => {
                                 if(res.status!= 200){

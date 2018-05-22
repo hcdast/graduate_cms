@@ -2,11 +2,20 @@
     <div class="app-container calendar-list-container">
         <div class="filter-container">
 
-            <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.academeId"
+            <span v-if="this.role == 2">
+                <el-select disabled clearable style="width: 200px" class="filter-item" v-model="searchList.academeId"
                        placeholder="所属学院">
-                <el-option v-for="item in academys" :key="item.key" :label="item.key" :value="item.val">
-                </el-option>
-            </el-select>
+                    <el-option v-for="item in academys" :key="item.key" :label="item.key" :value="item.val">
+                    </el-option>
+                </el-select>
+            </span>
+            <span v-else>
+                <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.academeId"
+                       placeholder="所属学院">
+                    <el-option v-for="item in academys" :key="item.key" :label="item.key" :value="item.val">
+                    </el-option>
+                </el-select>
+            </span>
             <el-button  class="filter-item" type="primary"  icon="search" @click="getAcademyMessage">搜索</el-button>
         </div>
 
@@ -90,6 +99,7 @@
                 nowYear:{
                     year:''
                 },
+                role:''
             }
         },
         filters : {
@@ -122,6 +132,9 @@
             getAcademyMessage(){
                 this.searchList.aid = this.aid;
                 this.listLoading = true;
+                if(this.role == 2){
+                    this.searchList.academeId = this.academeIdOfStore;
+                }
                 return new Promise(resolve=> {
                     getAcademyMessage(this.searchList).then((res)=> {
                         if(res.status!= 200){
@@ -189,6 +202,7 @@
             },
         },
         created() {
+            this.role = this.roles[0]
             function setAcademys () {
                 return new Promise((resolve,reject) => {
                     getAcademys(academys => {
@@ -215,7 +229,9 @@
         computed : {
             ...mapGetters ( [
                 'aid',
-                'init'
+                'init',
+                'roles',
+                'academeIdOfStore',
             ] ),
         },
     }

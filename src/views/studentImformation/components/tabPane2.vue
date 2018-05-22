@@ -1,20 +1,51 @@
 <template>
   <div>
     <div class="filter-container">
-
-        <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
-            <el-option v-for="item in academys" :key="item.id" :label="item.key" :value="item.val">
-            </el-option>
-        </el-select>
+        <span v-if="this.academeIdOfStore == 0 && this.classIdOfStore == 0">
+            <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
+                <el-option v-for="item in academys" :key="item.id" :label="item.key" :value="item.val">
+                </el-option>
+            </el-select>
+        </span>
+        <span v-if="this.academeIdOfStore !== 0 && this.classIdOfStore == 0">
+            <el-select disabled clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
+                <el-option v-for="item in academys" :key="item.id" :label="item.key" :value="item.val">
+                </el-option>
+            </el-select>
+        </span>
+        <span v-if="this.academeIdOfStore !== 0 && this.classIdOfStore !== 0">
+            <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
+                <span v-if="this.permison == 3">
+                    <el-option v-for="item in academysClasss" :key="item.id" :label="item.key" :value="item.val">
+                    </el-option>
+                </span>
+                <span v-else>
+                    <el-option v-for="item in academys" :key="item.id" :label="item.key" :value="item.val">
+                    </el-option>
+                </span>
+            </el-select>
+        </span>
 
         <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.majorId" placeholder="全部专业">
-            <el-option v-for="item in majors" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.academeId == item.acaid">
-            </el-option>
+            <span v-if="this.permison == 3">
+                <el-option v-for="item in majorsClasss" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.academeId == item.acaid">
+                </el-option>
+            </span>
+            <span v-else>
+                <el-option v-for="item in majors" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.academeId == item.acaid">
+                </el-option>
+            </span>
         </el-select>
 
         <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.classId" placeholder="全部班级">
-            <el-option v-for="item in classes" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.majorId == item.majid">
-            </el-option>
+            <span v-if="this.permison == 3">
+                <el-option v-for="item in classesClasss" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.majorId == item.majid">
+                </el-option>
+            </span>
+            <span v-else>
+                <el-option v-for="item in classes" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.majorId == item.majid">
+                </el-option>
+            </span>
         </el-select>
 
         <el-input @keyup.enter.native="getForm" style="width: 200px;" class="filter-item" placeholder="搜索学生学号" v-model="searchList.account">
@@ -22,9 +53,9 @@
 
         <el-button class="filter-item" type="primary"  icon="search" @click="getForm" >搜索</el-button>
         <div class="button-gr"  v-if="role && role == 2">
-        <el-button class="filter-item" type="primary" @click="upToOffice" style="background:white;color:#20a0ff;">已选上报教务</el-button>
+        <!-- <el-button class="filter-item" type="primary" @click="upToOffice" style="background:white;color:#20a0ff;">已选上报教务</el-button> -->
         <!-- <el-button class="filter-item" type="primary" @click="upToOfficeAll">全部上报教务</el-button> -->
-        <el-button class="filter-item" type="primary" @click="getMessageToClass">已选驳回班级</el-button>
+        <!-- <el-button class="filter-item" type="primary" @click="getMessageToClass">已选驳回班级</el-button> -->
         <!-- <el-button class="filter-item" type="primary" @click="getMessageToClassAll">全部驳回班级</el-button> -->
         </div>
     </div>
@@ -36,9 +67,9 @@
             <el-button class="filter-item" type="primary" @click="handleDownload" :loading="downloadLoading">打印已选</el-button>
             <el-button class="filter-item" type="primary" @click="handleDownloadAll" :loading="downloadLoading">打印所有</el-button>
             <div class="button-gr"  v-if="role && role == 2">
-            <!-- <el-button class="filter-item" type="primary" @click="upToOffice">已选上报教务</el-button> -->
+            <el-button class="filter-item" type="primary" @click="upToOffice" style="background:white;color:#20a0ff;">已选上报教务</el-button>
             <el-button class="filter-item" type="primary" @click="upToOfficeAll" style="background:white;color:#20a0ff;">全部上报教务</el-button>
-            <!-- <el-button class="filter-item" type="primary" @click="getMessageToClass">已选驳回班级</el-button> -->
+            <el-button class="filter-item" type="primary" @click="getMessageToClass">已选驳回班级</el-button>
             <el-button class="filter-item" type="primary" @click="getMessageToClassAll">全部驳回班级</el-button>
             </div>
     </div>
@@ -63,13 +94,13 @@
       </template>
     </el-table-column>
 
-    <el-table-column width="180px" label="所属行政班">
+    <el-table-column align="center" width="180px" label="所属行政班">
       <template slot-scope="scope">
          <span>{{classesFilter(scope.row.classId)}}</span>
       </template>
     </el-table-column>
 
-    <el-table-column width="110px" align="center" label="学号">
+    <el-table-column width="180px" align="center" label="学号">
       <template slot-scope="scope">
         <span>{{scope.row.account}}</span>
       </template>
@@ -81,7 +112,7 @@
       </template>
     </el-table-column>
 
-    <el-table-column width="120px" label="年级">
+    <el-table-column align="center" width="120px" label="年级">
       <template slot-scope="scope">
        <span>{{scope.row.year}}</span>
       </template>
@@ -134,7 +165,7 @@
 
 <script scoped>
 import { mapGetters } from 'vuex'
-import {getStudentListParam, updateStudent} from '../../../newapi/studentMessage'
+import {getStudentListParam, updateStudent, getStudentListClass} from '../../../newapi/studentMessage'
 import { getAcademys, getMajors, getClasses } from '../../../filters/contentfilters'
 export default {
   props: {
@@ -175,7 +206,16 @@ export default {
                 bookType : 'xlsx',
                 bookSST : true,
                 type : 'binary'
-            }
+            },
+      permison:'',
+      classsget: {
+          adminId : '',
+          page: 1,
+          size:100000
+      },
+      academysClasss:[],
+      majorsClasss:[],
+      classesClasss:[],
     }
   },
   filters: {
@@ -208,23 +248,61 @@ export default {
   },
   methods: {
     getForm(){
-        return new Promise( resolve => {
-            getStudentListParam(this.searchList).then( (res) => {
-                if(res.status!=200) {
-                    this.$message.error('请求失败，网络原因请重试！');
-                }else {
-                        if(!res.data||res.data.code !=0){
-                            this.$message.error('请求失败，服务器内部错误请重试或者联系开发者！');
-                        }else{
-                            this.tab2 = res.data.data;
-                            if(this.searchList.page==1){
-                                this.total = parseInt(res.data.message);
+        this.permison = this.roles[0];
+        if(this.permison == 3){
+            this.searchList.adminId = this.aid;
+             return new Promise( resolve => {
+                getStudentListClass(this.searchList).then( (res) => {
+                    if(res.status != 200) {
+                        this.$message.error('请求失败，网络原因请重试！');
+                    }else {
+                            if(!res.data||res.data.code !=0){
+                                this.$message.error('请求失败，服务器内部错误请重试或者联系开发者！');
+                            }else{
+                                this.tab2 = res.data.data;
+                                if(this.searchList.page==1){
+                                    this.total = parseInt(res.data.message);
+                                }
                             }
                         }
-                    }
+                        // this.initform();
+                })
+                resolve()
             })
-            resolve()
-        })
+        }else {
+            if(this.academeIdOfStore ==0 && this.classIdOfStore == 0) {
+                console.log(213)
+            }else if(this.academeIdOfStore !==0 && this.classIdOfStore == 0){
+                this.searchList.academeId = this.academeIdOfStore;
+            }else{
+                // this.searchList.academeId = this.academeIdOfStore;
+                // this.searchList.classId = this.classIdOfStore;
+            }
+            return new Promise( resolve => {
+                getStudentListParam(this.searchList).then( (res) => {
+                    if(res.status!=200) {
+                        this.$message.error('请求失败，网络原因请重试！');
+                    }else {
+                            if(!res.data||res.data.code !=0){
+                                this.$message.error('请求失败，服务器内部错误请重试或者联系开发者！');
+                            }else{
+                                this.tab2 = res.data.data;
+                                if(this.searchList.page==1){
+                                    this.total = parseInt(res.data.message);
+                                }
+                            }
+                        }
+                        // this.initform();
+                })
+                resolve()
+            })
+        }
+
+    },
+    // 清空
+    initform(){
+        this.searchList.academeId = '';
+        this.searchList.classId = ''
     },
     // 上报教务操作
     upToOffice(){
@@ -580,14 +658,14 @@ export default {
     },
     // 全选驳回
     getMessageToClassAll(){
-        this.$confirm('此操作将全部驳回给院系, 是否继续?', '提示', {
+        this.$confirm('此操作将全部驳回给班级, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$message({
             type: 'success',
-            message: '删除成功!'
+            message: '驳回成功!'
           });
           this.searchList.size = this.total;
           getStudentListParam(this.searchList).then( (res) => {
@@ -628,20 +706,20 @@ export default {
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '已取消删除'
+            message: '已取消驳回'
           });
         });
     },
     // 全部上报
     upToOfficeAll(){
-        this.$confirm('此操作将全部驳回给院系, 是否继续?', '提示', {
+        this.$confirm('此操作将全部上报给教务, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$message({
             type: 'success',
-            message: '删除成功!'
+            message: '上报成功!'
           });
           this.searchList.size = this.total;
           getStudentListParam(this.searchList).then( (res) => {
@@ -682,7 +760,7 @@ export default {
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '已取消删除'
+            message: '已取消上报'
           });
         });
     },
@@ -690,6 +768,66 @@ export default {
     // 解析json
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]))
+    },
+
+    // 当班级管理员登录时获取对应的学院专业班级
+    getImformationForClasss() {
+        this.classsget.adminId = this.aid;
+        return new Promise( resolve => {
+            getStudentListClass(this.classsget).then((res) => {
+                if(res.status != 200) {
+                        this.$message.error('请求失败，网络原因请重试！');
+                    }else {
+                        if(!res.data||res.data.code !=0){
+                            this.$message.error('请求失败，服务器内部错误请重试或者联系开发者！');
+                        }else{
+                            console.log(res.data.data)
+                            let data = res.data.data;
+                            let data1 = [];
+                            let data2 = [];
+                            let data3 = [];
+                            for(let i =0;i< data.length;i++){
+                                data1.push(data[i].academeId);
+                                data2.push(data[i].majorId);
+                                data3.push(data[i].classId);
+                            }
+                            // 进行数组去重
+                            let simpleData1 = [...new Set(data1)];
+                            let simpleData2 = [...new Set(data2)];
+                            let simpleData3 = [...new Set(data3)];
+                            // 遍历出学院
+                            for(let i=0;i<simpleData1.length;i++){
+                                for(let j =0;j<this.academys.length;j++){
+                                    if(simpleData1[i] == this.academys[j].val){
+                                        let eldata = this.academys[i]
+                                        this.academysClasss.push(eldata)
+                                    }
+                                }
+                            }
+                            // 遍历出专业
+                            for(let i=0;i<simpleData2.length;i++){
+                                for(let j =0;j<this.majors.length;j++){
+                                    if(simpleData2[i] == this.majors[j].val){
+                                        let eldata = this.majors[i]
+                                        this.majorsClasss.push(eldata)
+                                    }
+                                }
+                            }
+                            // 遍历出班级
+                            for(let i=0;i<simpleData3.length;i++){
+                                for(let j =0;j<this.classes.length;j++){
+                                    if(simpleData3[i] == this.classes[j].val){
+                                        let eldata = this.classes[i]
+                                        this.classesClasss.push(eldata)
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+            })
+            resolve();
+        })
     },
   },
   created() {
@@ -724,12 +862,15 @@ export default {
     }).then(classes => {
         this.classes = classes;
         this.getForm();
+        this.getImformationForClasss();
     })
   },
   computed : {
         ...mapGetters ( [
             'aid',
-            'roles'
+            'roles',
+            'academeIdOfStore',
+            'classIdOfStore'
         ] )
     },
 }

@@ -51,16 +51,40 @@ export const getAcademeAdmin = params => {
 /*
 获取班级管理员
 */
+// export const getClassAdmin = params => {
+//     return axios({
+//         method : 'post',
+//         url : `${baseURL}/admin/getClassAdminByNameAnd`,
+//         header : {
+//             'Content-type' : 'application/x-www-form-urlencoded'
+//         },
+//         params : params
+//     })
+// };
 export const getClassAdmin = params => {
     return axios({
         method : 'post',
-        url : `${baseURL}/admin/getClassAdminByNameAnd`,
+        url : `${baseURL}/admin/getClassAdminList`,
         header : {
             'Content-type' : 'application/x-www-form-urlencoded'
         },
         params : params
     })
 };
+
+/**
+ * 班级管理员停用复用**/
+export const updateClassAdmin = params => {
+    return axios({
+        method : 'post',
+        url : `${baseURL}/admin/classAdminDeleteOrResume`,
+        header : {
+            'Content-type' : 'application/x-www-form-urlencoded'
+        },
+        params : params
+    })
+};
+
 
 /****
  * 通过学院ID获取名称
@@ -90,6 +114,20 @@ export const createdAdmin = params => {
         params : params
     })
 };
+
+/**
+ * 增加班级管理员**/
+export const createdClassAdmin = params => {
+    return axios({
+        method : 'post',
+        url : `${baseURL}/admin/addClassAdmin`,
+        header : {
+            'Content-type' : 'application/x-www-form-urlencoded'
+        },
+        params : params
+    })
+};
+
 
 /**
  *获取所有的院系**/

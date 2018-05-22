@@ -1,27 +1,58 @@
 <template>
 <div>
     <div class="filter-container">
-
+        <span v-if="this.academeIdOfStore == 0 && this.classIdOfStore == 0">
         <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
             <el-option v-for="item in academys" :key="item.key" :label="item.key" :value="item.val">
             </el-option>
         </el-select>
+        </span>
+        <span v-if="this.academeIdOfStore !== 0 && this.classIdOfStore == 0">
+            <el-select disabled clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
+                <el-option v-for="item in academys" :key="item.id" :label="item.key" :value="item.val">
+                </el-option>
+            </el-select>
+        </span>
+        <span v-if="this.academeIdOfStore !== 0 && this.classIdOfStore !== 0">
+            <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.academeId" placeholder="全部学院">
+                <span v-if="this.permison == 3">
+                    <el-option v-for="item in academysClasss" :key="item.id" :label="item.key" :value="item.val">
+                    </el-option>
+                </span>
+                <span v-else>
+                    <el-option v-for="item in academys" :key="item.id" :label="item.key" :value="item.val">
+                    </el-option>
+                </span>
+            </el-select>
+        </span>
 
         <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.majorId" placeholder="全部专业">
-            <el-option v-for="item in majors" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.academeId == item.acaid">
-            </el-option>
+            <span v-if="this.permison == 3">
+                <el-option v-for="item in majorsClasss" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.academeId == item.acaid">
+                </el-option>
+            </span>
+            <span v-else>
+                <el-option v-for="item in majors" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.academeId == item.acaid">
+                </el-option>
+            </span>
         </el-select>
 
         <el-select clearable style="width: 200px" class="filter-item" v-model="searchList.classId" placeholder="全部班级">
-            <el-option v-for="item in classes" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.majorId == item.majid">
-            </el-option>
+            <span v-if="this.permison == 3">
+                <el-option v-for="item in classesClasss" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.majorId == item.majid">
+                </el-option>
+            </span>
+            <span v-else>
+                <el-option v-for="item in classes" :key="item.key" :label="item.key" :value="item.val" v-if="searchList.majorId == item.majid">
+                </el-option>
+            </span>
         </el-select>
 
         <el-input @keyup.enter.native="getForm" style="width: 200px;" class="filter-item" placeholder="搜索学生学号" v-model="searchList.account">
         </el-input>
         <el-button class="filter-item" type="primary"  icon="search" @click="getForm" >搜索</el-button>
         <div class="button-gr" v-if="role && role == 1">
-        <el-button class="filter-item" type="primary" @click="getMessageToAcademy">已选驳回院系</el-button>
+        <!-- <el-button class="filter-item" type="primary" @click="getMessageToAcademy">已选驳回院系</el-button> -->
         <!-- <el-button class="filter-item" type="primary" @click="getMessageToAcademyAll" >全部驳回院系</el-button> -->
         </div>
     </div>
@@ -33,91 +64,90 @@
         <el-button class="filter-item" type="primary" @click="handleDownload" :loading="downloadLoading">打印已选</el-button>
         <el-button class="filter-item" type="primary" @click="handleDownloadAll" :loading="downloadLoading">打印所有</el-button>
         <div class="button-gr" v-if="role && role == 1">
-        <!-- <el-button class="filter-item" type="primary" @click="getMessageToAcademy">已选驳回院系</el-button> -->
+        <el-button class="filter-item" type="primary" @click="getMessageToAcademy">已选驳回院系</el-button>
         <el-button class="filter-item" type="primary" @click="getMessageToAcademyAll" >全部驳回院系</el-button>
         </div>
     </div>
 
     <el-table :data="tab1" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" ref="multipleTable">
 
-    <el-table-column align="center" label="序号" width="80px">
+        <el-table-column align="center" label="序号" width="80px">
+            <template slot-scope="scope">
+                <span>{{scope.$index + 1}}</span>
+            </template>
+        </el-table-column>
+
+        <el-table-column align="center" label="院系" width="180"  v-loading="loading" element-loading-text="请给我点时间！">
         <template slot-scope="scope">
-            <span>{{scope.$index + 1}}</span>
+            <span>{{academyFilter(scope.row.academeId)}}</span>
         </template>
-    </el-table-column>
+        </el-table-column>
 
-    <el-table-column align="center" label="院系" width="180"  v-loading="loading"
-    element-loading-text="请给我点时间！">
-      <template slot-scope="scope">
-        <span>{{academyFilter(scope.row.academeId)}}</span>
-      </template>
-    </el-table-column>
+        <el-table-column width="180" align="center" label="专业">
+        <template slot-scope="scope">
+            <span>{{majorFilter(scope.row.majorId)}}</span>
+        </template>
+        </el-table-column>
 
-    <el-table-column width="180" align="center" label="专业">
-      <template slot-scope="scope">
-        <span>{{majorFilter(scope.row.majorId)}}</span>
-      </template>
-    </el-table-column>
+        <el-table-column width="180" align="center" label="所属行政班">
+        <template slot-scope="scope">
+            <span>{{classesFilter(scope.row.classId)}}</span>
+        </template>
+        </el-table-column>
 
-    <el-table-column width="180" align="center" label="所属行政班">
-      <template slot-scope="scope">
-        <span>{{classesFilter(scope.row.classId)}}</span>
-      </template>
-    </el-table-column>
+        <el-table-column width="140px" align="center" label="学号">
+        <template slot-scope="scope">
+            <span>{{scope.row.account}}</span>
+        </template>
+        </el-table-column>
 
-    <el-table-column width="140px" align="center" label="学号">
-      <template slot-scope="scope">
-        <span>{{scope.row.account}}</span>
-      </template>
-    </el-table-column>
+        <el-table-column width="120px" align="center" label="姓名">
+        <template slot-scope="scope">
+            <span>{{scope.row.realName}}</span>
+        </template>
+        </el-table-column>
 
-    <el-table-column width="120px" align="center" label="姓名">
-      <template slot-scope="scope">
-        <span>{{scope.row.realName}}</span>
-      </template>
-    </el-table-column>
+        <el-table-column width="100px" align="center" label="年级">
+        <template slot-scope="scope">
+        <span>{{scope.row.year}}</span>
+        </template>
+        </el-table-column>
 
-    <el-table-column width="100px" align="center" label="年级">
-      <template slot-scope="scope">
-       <span>{{scope.row.year}}</span>
-      </template>
-    </el-table-column>
+        <el-table-column align="center" label="毕业批次" width="95">
+        <template slot-scope="scope">
+            <span>{{scope.row.graduateBatch | mapGraduateBatch}}</span>
+        </template>
+        </el-table-column>
 
-    <el-table-column align="center" label="毕业批次" width="95">
-      <template slot-scope="scope">
-        <span>{{scope.row.graduateBatch | mapGraduateBatch}}</span>
-      </template>
-    </el-table-column>
+        <el-table-column align="center" label="毕业结论" width="95">
+        <template slot-scope="scope">
+            <span>{{scope.row.graduateConclusion | mapGraduateConclusion}}</span>
+        </template>
+        </el-table-column>
 
-    <el-table-column align="center" label="毕业结论" width="95">
-      <template slot-scope="scope">
-        <span>{{scope.row.graduateConclusion | mapGraduateConclusion}}</span>
-      </template>
-    </el-table-column>
+        <el-table-column class-name="status-col" label="是否授予学位" width="110">
+        <template slot-scope="scope">
+            <span>{{scope.row.isDegree | mapDegree}}</span>
+        </template>
+        </el-table-column>
 
-    <el-table-column class-name="status-col" label="是否授予学位" width="110">
-      <template slot-scope="scope">
-        <span>{{scope.row.isDegree | mapDegree}}</span>
-      </template>
-    </el-table-column>
+        <el-table-column class-name="status-col" label="是否有学籍表" width="110">
+        <template slot-scope="scope">
+            <span>{{scope.row.isSchoolForm | mapSchoolForm}}</span>
+        </template>
+        </el-table-column>
 
-    <el-table-column class-name="status-col" label="是否有学籍表" width="110">
-      <template slot-scope="scope">
-        <span>{{scope.row.isSchoolForm | mapSchoolForm}}</span>
-      </template>
-    </el-table-column>
+        <el-table-column class-name="status-col" label="状态" width="110">
+        <template slot-scope="scope">
+            <el-tag :type="scope.row.status | statusTypeFilter">{{scope.row.status | statusFilter}}</el-tag>
+        </template>
+        </el-table-column>
 
-    <el-table-column class-name="status-col" label="状态" width="110">
-      <template slot-scope="scope">
-        <el-tag :type="scope.row.status | statusTypeFilter">{{scope.row.status | statusFilter}}</el-tag>
-      </template>
-    </el-table-column>
-
-    <el-table-column
-      type="selection"
-      width="55"
-      fixed="right">
-    </el-table-column>
+        <el-table-column
+        type="selection"
+        width="55"
+        fixed="right">
+        </el-table-column>
 
   </el-table>
   <div class="pagination-container">
@@ -130,9 +160,8 @@
 
 <script scoped>
 import { mapGetters } from 'vuex'
-import {getStudentListParam, updateStudent} from '../../../newapi/studentMessage'
+import {getStudentListParam, updateStudent, getStudentListClass} from '../../../newapi/studentMessage'
 import { getAcademys, getMajors, getClasses } from '../../../filters/contentfilters'
-import { SSL_OP_SINGLE_ECDH_USE } from 'constants';
 export default {
   props: {
     type: {
@@ -153,7 +182,8 @@ export default {
         academeId:'',
         majorId:'',
         classId:'',
-        account:''
+        account:'',
+        adminId: ''
       },
       tab1:[],
       academys:[],
@@ -172,7 +202,16 @@ export default {
                 bookType : 'xlsx',
                 bookSST : true,
                 type : 'binary'
-            }
+            },
+      permison:'',
+      classsget: {
+          adminId : '',
+          page: 1,
+          size:100000
+      },
+      academysClasss:[],
+      majorsClasss:[],
+      classesClasss:[],
     }
   },
   filters: {
@@ -206,23 +245,62 @@ export default {
   methods: {
     // 获取当前数据
     getForm(){
-        return new Promise( resolve => {
-            getStudentListParam(this.searchList).then( (res) => {
-                if(res.status != 200) {
-                    this.$message.error('请求失败，网络原因请重试！');
-                }else {
-                        if(!res.data||res.data.code !=0){
-                            this.$message.error('请求失败，服务器内部错误请重试或者联系开发者！');
-                        }else{
-                            this.tab1 = res.data.data;
-                            if(this.searchList.page==1){
-                                this.total = parseInt(res.data.message);
+        this.permison = this.roles[0];
+        if(this.permison == 3){
+            this.searchList.adminId = this.aid;
+             return new Promise( resolve => {
+                getStudentListClass(this.searchList).then( (res) => {
+                    if(res.status != 200) {
+                        this.$message.error('请求失败，网络原因请重试！');
+                    }else {
+                            if(!res.data||res.data.code !=0){
+                                this.$message.error('请求失败，服务器内部错误请重试或者联系开发者！');
+                            }else{
+                                this.tab1 = res.data.data;
+                                if(this.searchList.page==1){
+                                    this.total = parseInt(res.data.message);
+                                }
                             }
                         }
-                    }
+                        // this.initform();
+                })
+                resolve()
             })
-            resolve()
-        })
+        }else {
+            if(this.academeIdOfStore ==0 && this.classIdOfStore == 0) {
+                console.log(213)
+            }else if(this.academeIdOfStore !==0 && this.classIdOfStore == 0){
+                this.searchList.academeId = this.academeIdOfStore;
+            }else{
+                // this.searchList.academeId = this.academeIdOfStore;
+                // this.searchList.classId = this.classIdOfStore;
+                console.log(this.academeIdOfStore)
+                console.log(this.classIdOfStore)
+            }
+            return new Promise( resolve => {
+                getStudentListParam(this.searchList).then( (res) => {
+                    if(res.status != 200) {
+                        this.$message.error('请求失败，网络原因请重试！');
+                    }else {
+                            if(!res.data||res.data.code !=0){
+                                this.$message.error('请求失败，服务器内部错误请重试或者联系开发者！');
+                            }else{
+                                this.tab1 = res.data.data;
+                                if(this.searchList.page==1){
+                                    this.total = parseInt(res.data.message);
+                                }
+                            }
+                        }
+                        // this.initform();
+                })
+                resolve()
+            })
+        }
+    },
+    // 清空
+    initform(){
+        this.searchList.academeId = '';
+        this.searchList.classId = ''
     },
     // 驳回学院操作
     getMessageToAcademy(){
@@ -560,7 +638,7 @@ export default {
         }).then(() => {
           this.$message({
             type: 'success',
-            message: '删除成功!'
+            message: '驳回成功!'
           });
           this.searchList.size = this.total;
           getStudentListParam(this.searchList).then( (res) => {
@@ -601,7 +679,7 @@ export default {
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '已取消删除'
+            message: '已取消驳回'
           });
         });
     },
@@ -610,6 +688,64 @@ export default {
       return jsonData.map(v => filterVal.map(j => v[j]))
     },
 
+    // 当班级管理员登录时获取对应的学院专业班级
+    getImformationForClasss() {
+        this.classsget.adminId = this.aid;
+        return new Promise( resolve => {
+            getStudentListClass(this.classsget).then((res) => {
+                if(res.status != 200) {
+                        this.$message.error('请求失败，网络原因请重试！');
+                    }else {
+                        if(!res.data||res.data.code !=0){
+                            this.$message.error('请求失败，服务器内部错误请重试或者联系开发者！');
+                        }else{
+                            let data = res.data.data;
+                            let data1 = [];
+                            let data2 = [];
+                            let data3 = [];
+                            for(let i =0;i< data.length;i++){
+                                data1.push(data[i].academeId);
+                                data2.push(data[i].majorId);
+                                data3.push(data[i].classId);
+                            }
+                            // 进行数组去重
+                            let simpleData1 = [...new Set(data1)];
+                            let simpleData2 = [...new Set(data2)];
+                            let simpleData3 = [...new Set(data3)];
+                            // 遍历出学院
+                            for(let i=0;i<simpleData1.length;i++){
+                                for(let j = 0;j<this.academys.length;j++){
+                                    if(simpleData1[i] == this.academys[j].val){
+                                        let eldata = this.academys[j]
+                                        this.academysClasss.push(eldata)
+                                    }
+                                }
+                            }
+                            // 遍历出专业
+                            for(let i=0;i<simpleData2.length;i++){
+                                for(let j =0;j<this.majors.length;j++){
+                                    if(simpleData2[i] == this.majors[j].val){
+                                        let eldata = this.majors[j]
+                                        this.majorsClasss.push(eldata)
+                                    }
+                                }
+                            }
+                            // 遍历出班级
+                            for(let i=0;i<simpleData3.length;i++){
+                                for(let j =0;j<this.classes.length;j++){
+                                    if(simpleData3[i] == this.classes[j].val){
+                                        let eldata = this.classes[j]
+                                        this.classesClasss.push(eldata)
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+            })
+            resolve();
+        })
+    },
   },
   created() {
     this.role = this.roles;
@@ -643,12 +779,15 @@ export default {
     }).then(classes => {
         this.classes = classes;
         this.getForm();
+        this.getImformationForClasss();
     })
   },
   computed : {
         ...mapGetters ( [
             'aid',
-            'roles'
+            'roles',
+            'academeIdOfStore',
+            'classIdOfStore'
         ] )
     },
 }

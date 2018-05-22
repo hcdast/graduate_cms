@@ -12,6 +12,7 @@ const user = {
         roles : [],
         schoolId: null,
         academeIdOfStore:null,
+        classIdOfStore:null,
         init: null,
 
     },
@@ -31,6 +32,9 @@ const user = {
         },
         SET_ACADEMEIDOFSTORE : (state, academeIdOfStore) => {
             state.academeIdOfStore = academeIdOfStore
+        },
+        SET_CLASSIDOFSTORE : (state, classIdOfStore) => {
+            state.classIdOfStore = classIdOfStore
         },
         SET_REALNAME: (state, realName) => {
             state.realName = realName
@@ -78,6 +82,7 @@ const user = {
             return new Promise( (resolve, reject) => {
                 checkUserLogin(userInfo).then(response =>{
                     const data = response.data.data
+                    console.log(data)
                     sessionStorage.setItem('user', JSON.stringify(userInfo))
                     commit ( 'SET_AID', data[1].id)
                     commit ( 'SET_ROLES', data[1].authority )
@@ -86,6 +91,7 @@ const user = {
                     commit ( 'SET_REALNAME', data[1].realName )
                     commit ( 'SET_INIT', data[0].isInit )
                     commit( 'SET_ACADEMEIDOFSTORE', data[1].academeId )
+                    commit( 'SET_CLASSIDOFSTORE', data[1].classId )
                     resolve ( response )
                 }).catch( error => {
                     reject( error )
