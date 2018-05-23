@@ -122,8 +122,8 @@ export default {
                             this.$message.error('请求失败，服务器内部错误请重试或者联系开发者！');
                         }else{
                             this.tableData = res.data.data;
-                            // console.log(this.tableData)
-                            // console.log(this.tableData[this.tableData.length - 1].graduateYear)
+                            // // console.log(this.tableData)
+                            // // console.log(this.tableData[this.tableData.length - 1].graduateYear)
                             // 获取一个当前初始化的年
                             this.addOperationForm.graduateYear = this.tableData[this.tableData.length - 1].graduateYear
                         }
@@ -151,10 +151,10 @@ export default {
                             this.addOperationForm.adminId = this.aid;
                             addOperation(this.addOperationForm).then(res => {
                                 if(res.status = 200){
-                                        // console.log('操作记录添加成功')
+                                        // // console.log('操作记录添加成功')
                                         this.getOperationLists()
                                 }else{
-                                        // console.log('操作记录添加失败')
+                                        // // console.log('操作记录添加失败')
                                 }
                             })
                         }
@@ -166,8 +166,8 @@ export default {
         },
         created() {
             this.getOperationLists();
-            // console.log(this.aid)
-            // console.log(localStorage.graduateYear)
+            // // console.log(this.aid)
+            // // console.log(localStorage.graduateYear)
         },
         computed : {
             ...mapGetters ( [

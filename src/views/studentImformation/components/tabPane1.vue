@@ -161,6 +161,7 @@
 <script scoped>
 import { mapGetters } from 'vuex'
 import {getStudentListParam, updateStudent, getStudentListClass} from '../../../newapi/studentMessage'
+import { exportGraduateListParam, exportJudeListParam } from '../../../newapi/exportExe'
 import { getAcademys, getMajors, getClasses } from '../../../filters/contentfilters'
 export default {
   props: {
@@ -192,8 +193,8 @@ export default {
       multipleSelection: '',
       filename:'',
       exForm:[
-          { val:'打印毕业一览表', key: '打印毕业一览表'},
-          { val:'打印分会审批一览表', key: '打印分会审批一览表'},
+          { val:'毕业一览表', key: '毕业一览表'},
+          { val:'分会审批一览表', key: '分会审批一览表'},
       ],
       allSelect:[],
       exportData1: [],
@@ -233,7 +234,7 @@ export default {
         return status == 1 ? '第一批次' : status == 2 ? '第二批次' : status == 3 ? '延期毕业' : '待填写'
     },
     mapGraduateConclusion(status){
-        return status == 1 ? '拟肄业' : status == 2 ? '拟结业' : status == 3 ? '拟毕业' : '待填写'
+        return status == 1 ? '拟毕业' : status == 2 ? '拟结业' : status == 3 ? '拟肄业' : '待填写'
     },
     mapDegree(status){
         return status == 0 ? '待填写' : status == 1 ? '拟授予' : status == 2 ? '拟不授予' : '待填写'
@@ -268,14 +269,14 @@ export default {
             })
         }else {
             if(this.academeIdOfStore ==0 && this.classIdOfStore == 0) {
-                console.log(213)
+                // console.log(213)
             }else if(this.academeIdOfStore !==0 && this.classIdOfStore == 0){
                 this.searchList.academeId = this.academeIdOfStore;
             }else{
                 // this.searchList.academeId = this.academeIdOfStore;
                 // this.searchList.classId = this.classIdOfStore;
-                console.log(this.academeIdOfStore)
-                console.log(this.classIdOfStore)
+                // console.log(this.academeIdOfStore)
+                // console.log(this.classIdOfStore)
             }
             return new Promise( resolve => {
                 getStudentListParam(this.searchList).then( (res) => {
@@ -342,9 +343,9 @@ export default {
                             this.$message.error('请求失败，服务器内部错误请重试或者联系开发者！');
                         }else{
                             this.allSelect = res.data.data;
-                            if(this.allSelect.length) {
+                            if(this.allSelect.length && !!this.filename) {
                                 for(var i =0;i<this.allSelect.length;i++){
-                                    // console.log(this.multipleSelection[i])
+                                    // // console.log(this.multipleSelection[i])
                                     this.allSelect[i].id = i+1
                                 }
                                 // 遍历出专业名
@@ -362,7 +363,7 @@ export default {
                                 })
                                 // 遍历出毕业结论
                                 this.allSelect.forEach(element => {
-                                    element.graclusionname = element.graduateConclusion == 0 ? '待填写' : element.graduateConclusion == 1 ? '拟肄业' : element.graduateConclusion == 2 ? '拟结业' : element.graduateConclusion == 3 ? '拟毕业' : '待填写'
+                                    element.graclusionname = element.graduateConclusion == 0 ? '待填写' : element.graduateConclusion == 1 ? '拟毕业' : element.graduateConclusion == 2 ? '拟结业' : element.graduateConclusion == 3 ? '拟肄业' : '待填写'
                                 })
                                 // 遍历出是否学士
                                 this.allSelect.forEach(element => {
@@ -373,7 +374,7 @@ export default {
                                     element.schoolformname = element.isSchoolForm == 1 ? '有' : element.isSchoolForm == 2 ? '无' : '待填写'
                                 })
                                 this.downloadLoading = true;
-                                if(this.filename == '打印分会审批一览表'){
+                                if(this.filename == '分会审批一览表'){
                                     this.allSelect.forEach(element =>{
                                         let Excel2 = {
                                                 id: '',
@@ -384,44 +385,55 @@ export default {
                                                 reason: '',
                                                 studentsign: '',
                                                 acadesign:'',
+                                                degreename:'',
+                                                graclusionname: '',
+                                                schoolformname: ''
                                             };
                                         Excel2.id = element.id;
-                                        // console.log(element.id)
+                                        // // console.log(element.id)
                                         Excel2.account = element.account;
                                         Excel2.realName = element.realName;
                                         Excel2.majorname = element.majorname;
                                         Excel2.reason = element.reason;
-                                        Excel2.sexname = element.sexname;
+                                        Excel2.sex = element.sexname;
+                                        Excel2.degreename = element.degreename;
+                                        Excel2.graclusionname = element.graclusionname;
+                                        Excel2.schoolformname = element.schoolformname;
                                         Excel2.studentsign = '';
                                         Excel2.acadesign = '';
                                         this.exportData2.push(Excel2)
                                     });
-                                    import('@/vendor/ExportExcelForMy2').then(excel => {
-                                    this.exportData2.unshift({});
-                                    this.exportData2.unshift({});
-                                    this.exportData2.unshift({});
-                                    this.exportData2.unshift({});
-                                    this.exportData2.push({id:'说明：'});
-                                    this.exportData2.push({id:'《安徽大学普通教育本科生学士学位授予工作实施细则》（校政〔2008〕1号）规定：'});
-                                    this.exportData2.push({id:'“第六条  修业期间有下列情形之一者，不予授予学士学位：'});
-                                    this.exportData2.push({account:'一、违反国家法律受到刑事处罚；        二、违反校规受到记过及以上处分；'});
-                                    this.exportData2.push({account:'三、考试舞弊受到严重警告及以上处分；  四、修业期满，平均学分绩点低于1.5；'});
-                                    this.exportData2.push({account:'五、毕业论文（设计、创作）成绩不及格；六、修业期间，退学警告累计达到三次及以上的；'});
-                                    this.exportData2.push({account:'七、修业期满，仍未修满毕业最低要求学分”。'});
-                                    const data1 = this.exportData2;
-                                    const length = data1.length;
-                                    // console.log(data1.length)
-                                    excel.export_json_to_excel(
-                                        data1,
-                                        this.filename,
-                                        this.wopts,
-                                        length
-                                    );
-                                    this.$refs.multipleTable.clearSelection();
-                                    this.exportData2 = [];
-                                    this.downloadLoading = false
-                                    })
-                                } else if(this.filename == '打印毕业一览表') {
+                                    for(let i =0;i<this.exportData2.length;i++){
+                                        if(this.exportData2[i].degreename == '待填写') {
+                                            this.middleData = '待填写'
+                                        }
+                                    }
+                                    if(this.middleData == '待填写'){
+                                        this.$notify({
+                                            title: '警告',
+                                            message: '请先完善是否毕业信息再来全部导出',
+                                            type: 'warning'
+                                            });
+                                    }else {
+                                        let paramData = {
+                                            jsonData : JSON.stringify(this.exportData2),
+                                        }
+                                        // 请求数据jsonData，
+                                        exportJudeListParam(paramData).then(res => {
+                                            var blob = new Blob([res.data], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8'}); //application/vnd.openxmlformats-officedocument.spreadsheetml.sheet这里表示xlsx类型
+                                            var downloadElement = document.createElement('a');
+                                            var href = window.URL.createObjectURL(blob); //创建下载的链接
+                                            downloadElement.href = href;
+                                            downloadElement.download = '分会审批表.xlsx'; //下载后文件名
+                                            document.body.appendChild(downloadElement);
+                                            downloadElement.click(); //点击下载
+                                            document.body.removeChild(downloadElement); //下载完成移除元素
+                                            window.URL.revokeObjectURL(href); //释放掉blob对象
+                                            this.exportData2 = [];
+                                            this.downloadLoading = false;
+                                        })
+                                    }
+                                } else if(this.filename == '毕业一览表') {
                                     this.allSelect.forEach(element =>{
                                         let Excel1 = {
                                                 id: '',
@@ -434,7 +446,7 @@ export default {
                                                 detailmessage: ''
                                             };
                                         Excel1.id = element.id;
-                                        // console.log(element.id)
+                                        // // console.log(element.id)
                                         Excel1.account = element.account;
                                         Excel1.realName = element.realName;
                                         Excel1.majorname = element.majorname;
@@ -444,21 +456,28 @@ export default {
                                         Excel1.detailmessage = '';
                                         this.exportData1.push(Excel1)
                                     })
-                                    import('@/vendor/ExportExcelForMy1').then(excel => {
-                                    this.exportData1.unshift({})
-                                    this.exportData1.unshift({})
-                                    const data = this.exportData1;
-                                    excel.export_json_to_excel(
-                                        data,
-                                        this.filename,
-                                        this.wopts);
-                                    this.exportData1 = [];
-                                    this.downloadLoading = false
+                                    let paramData = {
+                                            jsonData : JSON.stringify(this.exportData1),
+                                        }
+                                    // 请求数据jsonData，
+                                    // console.log(JSON.stringify(this.exportData1))
+                                    exportGraduateListParam(paramData).then(res => {
+                                        var blob = new Blob([res.data], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8'}); //application/vnd.openxmlformats-officedocument.spreadsheetml.sheet这里表示xlsx类型
+                                        var downloadElement = document.createElement('a');
+                                        var href = window.URL.createObjectURL(blob); //创建下载的链接
+                                        downloadElement.href = href;
+                                        downloadElement.download = '毕业一览表.xlsx'; //下载后文件名
+                                        document.body.appendChild(downloadElement);
+                                        downloadElement.click(); //点击下载
+                                        document.body.removeChild(downloadElement); //下载完成移除元素
+                                        window.URL.revokeObjectURL(href); //释放掉blob对象
+                                        this.exportData1 = [];
+                                        this.downloadLoading = false
                                     })
                                 }
                                 } else {
                                     this.$message({
-                                        message: '请选择要导出的人物信息',
+                                        message: !!this.filename ? '请选择要导出的人物信息':'请选择要导出的文件',
                                         type: 'warning'
                                     })
                                 }
@@ -468,9 +487,9 @@ export default {
     },
     // 部分表格导出
     handleDownload(){
-        if(this.multipleSelection.length) {
+        if(this.multipleSelection.length && !!this.filename) {
             for(var i =0;i<this.multipleSelection.length;i++){
-                // console.log(this.multipleSelection[i])
+                // // console.log(this.multipleSelection[i])
                 this.multipleSelection[i].id = i+1
             }
             // 遍历出专业名
@@ -488,7 +507,7 @@ export default {
             })
             // 遍历出毕业结论
             this.multipleSelection.forEach(element => {
-                element.graclusionname = element.graduateConclusion == 0 ? '待填写' : element.graduateConclusion == 1 ? '拟肄业' : element.graduateConclusion == 2 ? '拟结业' : element.graduateConclusion == 3 ? '拟毕业' : '待填写'
+                element.graclusionname = element.graduateConclusion == 0 ? '待填写' : element.graduateConclusion == 1 ? '拟毕业' : element.graduateConclusion == 2 ? '拟结业' : element.graduateConclusion == 3 ? '拟肄业' : '待填写'
             })
             // 遍历出是否学士
             this.multipleSelection.forEach(element => {
@@ -503,7 +522,7 @@ export default {
                 element.schoolformname = element.isSchoolForm == 1 ? '有' : element.isSchoolForm == 2 ? '无' : '待填写'
             });
             this.downloadLoading = true;
-            if(this.filename == '打印分会审批一览表'){
+            if(this.filename == '分会审批一览表'){
                 this.multipleSelection.forEach(element =>{
                     let Excel2 = {
                             id: '',
@@ -514,44 +533,56 @@ export default {
                             reason: '',
                             studentsign: '',
                             acadesign:'',
+                            degreename:'',
+                            graclusionname: '',
+                            schoolformname: ''
                         };
                     Excel2.id = element.id;
-                    // console.log(element.id)
+                    // // console.log(element.id)
                     Excel2.account = element.account;
                     Excel2.realName = element.realName;
                     Excel2.majorname = element.majorname;
                     Excel2.reason = element.reason;
-                    Excel2.sexname = element.sexname;
+                    Excel2.sex = element.sexname;
+                    Excel2.degreename = element.degreename;
+                    Excel2.graclusionname = element.graclusionname;
+                    Excel2.schoolformname = element.schoolformname;
                     Excel2.studentsign = '';
                     Excel2.acadesign = '';
                     this.exportData2.push(Excel2)
                 });
-                import('@/vendor/ExportExcelForMy2').then(excel => {
-                this.exportData2.unshift({});
-                this.exportData2.unshift({});
-                this.exportData2.unshift({});
-                this.exportData2.unshift({});
-                this.exportData2.push({id:'说明：'});
-                this.exportData2.push({id:'《安徽大学普通教育本科生学士学位授予工作实施细则》（校政〔2008〕1号）规定：'});
-                this.exportData2.push({id:'“第六条  修业期间有下列情形之一者，不予授予学士学位：'});
-                this.exportData2.push({account:'一、违反国家法律受到刑事处罚；        二、违反校规受到记过及以上处分；'});
-                this.exportData2.push({account:'三、考试舞弊受到严重警告及以上处分；  四、修业期满，平均学分绩点低于1.5；'});
-                this.exportData2.push({account:'五、毕业论文（设计、创作）成绩不及格；六、修业期间，退学警告累计达到三次及以上的；'});
-                this.exportData2.push({account:'七、修业期满，仍未修满毕业最低要求学分”。'});
-                const data1 = this.exportData2;
-                const length = data1.length;
-                // console.log(data1.length)
-                excel.export_json_to_excel(
-                    data1,
-                    this.filename,
-                    this.wopts,
-                    length
-                );
-                this.$refs.multipleTable.clearSelection();
-                this.exportData2 = [];
-                this.downloadLoading = false
-                })
-            } else if(this.filename == '打印毕业一览表') {
+                for(let i =0;i<this.exportData2.length;i++){
+                        if(this.exportData2[i].degreename == '待填写') {
+                            this.middleData = '待填写'
+                        }
+                    }
+                    if(this.middleData == '待填写'){
+                        this.$notify({
+                            title: '警告',
+                            message: '请先完善是否毕业信息再来导出',
+                            type: 'warning'
+                            });
+                    }else {
+                        let paramData = {
+                            jsonData : JSON.stringify(this.exportData2),
+                        }
+                        // 请求数据jsonData，
+                        exportJudeListParam(paramData).then(res => {
+                            var blob = new Blob([res.data], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8'}); //application/vnd.openxmlformats-officedocument.spreadsheetml.sheet这里表示xlsx类型
+                            var downloadElement = document.createElement('a');
+                            var href = window.URL.createObjectURL(blob); //创建下载的链接
+                            downloadElement.href = href;
+                            downloadElement.download = '分会审批表.xlsx'; //下载后文件名
+                            document.body.appendChild(downloadElement);
+                            downloadElement.click(); //点击下载
+                            document.body.removeChild(downloadElement); //下载完成移除元素
+                            window.URL.revokeObjectURL(href); //释放掉blob对象
+                            this.$refs.multipleTable.clearSelection();
+                            this.exportData2 = [];
+                            this.downloadLoading = false;
+                        })
+                    }
+            } else if(this.filename == '毕业一览表') {
                 this.multipleSelection.forEach(element =>{
                     let Excel1 = {
                             id: '',
@@ -564,7 +595,7 @@ export default {
                             detailmessage: ''
                         };
                     Excel1.id = element.id;
-                    // console.log(element.id)
+                    // // console.log(element.id)
                     Excel1.account = element.account;
                     Excel1.realName = element.realName;
                     Excel1.majorname = element.majorname;
@@ -574,22 +605,28 @@ export default {
                     Excel1.detailmessage = '';
                     this.exportData1.push(Excel1)
                 })
-                import('@/vendor/ExportExcelForMy1').then(excel => {
-                this.exportData1.unshift({})
-                this.exportData1.unshift({})
-                const data = this.exportData1;
-                excel.export_json_to_excel(
-                    data,
-                    this.filename,
-                    this.wopts);
-                this.$refs.multipleTable.clearSelection();
-                this.exportData1 = [];
-                this.downloadLoading = false
+                let paramData = {
+                        jsonData : JSON.stringify(this.exportData1),
+                    }
+                // 请求数据jsonData，
+                exportGraduateListParam(paramData).then(res => {
+                    var blob = new Blob([res.data], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8'}); //application/vnd.openxmlformats-officedocument.spreadsheetml.sheet这里表示xlsx类型
+                    var downloadElement = document.createElement('a');
+                    var href = window.URL.createObjectURL(blob); //创建下载的链接
+                    downloadElement.href = href;
+                    downloadElement.download = '毕业一览表.xlsx'; //下载后文件名
+                    document.body.appendChild(downloadElement);
+                    downloadElement.click(); //点击下载
+                    document.body.removeChild(downloadElement); //下载完成移除元素
+                    window.URL.revokeObjectURL(href); //释放掉blob对象
+                    this.$refs.multipleTable.clearSelection();
+                    this.exportData1 = [];
+                    this.downloadLoading = false
                 })
             }
             } else {
                 this.$message({
-                    message: '请选择要导出的人物信息',
+                    message: !!this.filename ? '请选择要导出的人物信息':'请选择要导出的文件',
                     type: 'warning'
                 })
             }

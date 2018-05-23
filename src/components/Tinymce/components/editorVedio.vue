@@ -57,14 +57,14 @@
                     this.$message ( '请等待所有视频上传成功 或 出现了网络问题，请刷新页面重新上传！' )
                     return
                 }
-                console.log ( arr )
+                // console.log ( arr )
                 this.$emit ( 'successCBK', arr )
                 this.listObj = {}
                 this.fileList = []
                 this.dialogVisible = false
             },
             handleSuccess( response, file ) {
-                console.log(file)
+                // console.log(file)
                 const uid = file.uid
                 const objKeyArr = Object.keys ( this.listObj )
                 for ( let i = 0, len = objKeyArr.length ; i < len ; i ++ ) {
@@ -74,7 +74,7 @@
                         return
                     }
                 }
-                console.log(response)
+                // console.log(response)
             },
             handleRemove( file ) {
                 const uid = file.uid

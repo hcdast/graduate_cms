@@ -211,7 +211,7 @@ export default {
         this.getStudentForClass();
         this.getStudentForAcademy();
         this.getStudentForOffice();
-        // console.log(this.roles[0])
+        // // console.log(this.roles[0])
         if(this.roles[0] == 1) {
             this.activeName = 'first'
         } else if( this.roles[0] == 2 ) {

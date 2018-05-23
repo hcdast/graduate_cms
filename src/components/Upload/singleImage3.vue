@@ -58,8 +58,8 @@
             },
             handleImageScucess(res,file ) {
 //                this.emitInput ( file.files.file )
-                console.log(res)
-                console.log(file)
+                // console.log(res)
+                // console.log(file)
                 this.emitInput(res.data[0])
             },
             beforeUpload(file) {
@@ -74,7 +74,7 @@
                         this.tempUrl = response.data.qiniu_url
                         resolve ( true )
                     } ).catch ( err => {
-                        console.log ( err )
+                        // console.log ( err )
                         reject ( false )
                     } )
                 } )*/

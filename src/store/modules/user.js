@@ -82,7 +82,7 @@ const user = {
             return new Promise( (resolve, reject) => {
                 checkUserLogin(userInfo).then(response =>{
                     const data = response.data.data
-                    console.log(data)
+                    // console.log(data)
                     sessionStorage.setItem('user', JSON.stringify(userInfo))
                     commit ( 'SET_AID', data[1].id)
                     commit ( 'SET_ROLES', data[1].authority )

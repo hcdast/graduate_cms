@@ -325,12 +325,12 @@
             },
             handleSubmit(formName){
                 if(this.academeIdOfStore == 0){
-                    console.log('教务管理员')
+                    // console.log('教务管理员')
                 } else{
                     this.addForm.academeId = this.academeIdOfStore;
                 }
-                console.log(this.addForm.academeId)
-                console.log(this.addForm)
+                // console.log(this.addForm.academeId)
+                // console.log(this.addForm)
                 this.$refs[formName].validate((valid) => {
                     if (valid){
                         // this.addFormVisible = false;
@@ -372,7 +372,7 @@
 
             getClassAdmins(){
                 if(this.academeIdOfStore == 0) {
-                    // console.log(213)
+                    // // console.log(213)
                 }else {
                     this.searchList.academeId = this.academeIdOfStore;
                 }
@@ -380,7 +380,7 @@
                 if(this.init === 1){
                     this.initializeVisible = false;
                     getClassAdmin(this.searchList).then((res) => {
-                        // console.log(res)
+                        // // console.log(res)
                         if(res.status!= 200){
                             this.$message.error('请求失败，网络原因请重试！');
                         }else {
@@ -410,7 +410,7 @@
                 this.deblockForm.aid = row.id;
                 this.deblockForm.classId = row.classId;
                 this.deblockForm.isDeleted = 1;
-                console.log(this.deblockForm)
+                // console.log(this.deblockForm)
                 return new Promise( resolve => {
                     updateClassAdmin(this.deblockForm).then( (res) => {
                         if(res.status!= 200){

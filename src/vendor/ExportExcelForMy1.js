@@ -32,12 +32,13 @@ function saveAs( obj, fileName ) {//当然可以自定义简单的下载文件�
 export function export_json_to_excel(data, filename,wopts) {
     // data = XLSX.utils.json_to_sheet ( data );
 
-    console.log(data)
-    console.log(filename)
-    console.log(wopts)
+    // console.log(data)
+    // console.log(filename)
+    // console.log(wopts)
     let wb = { SheetNames: ['Sheet1'], Sheets:{}, Props: {}}
     data = XLSX.utils.json_to_sheet ( data );
-    console.log(data)
+    // console.log(data);
+    // 单元格数据填充
     data[ "A1" ] = { t : "s", v : "安徽大学2015  届(夏)毕业生一览表"};
     data[ "A2" ] = { t : "s", v : "院系（印章）" };
     data[ "C2" ] = { t : "s", v : "领导签字：" };
@@ -52,6 +53,7 @@ export function export_json_to_excel(data, filename,wopts) {
     data[ "F3" ] = { t : "s", v : "是否授予学士" }
     data[ "G3" ] = { t : "s", v : "有无学籍表" }
     data[ "H3" ] = { t : "s", v : "备注" }
+    // 合并单元格
     data[ "!merges" ] = [
         {
             s : {
@@ -92,6 +94,26 @@ export function export_json_to_excel(data, filename,wopts) {
             }
         }
     ];
+    // 单元格居中对齐
+
+    // 单元格加粗
+
+    // 单元格宽度
+    data['!cols'] = [
+        {wpx: 30},
+        {wpx: 70,},
+        {wpx: 60,},
+        {wpx: 120,},
+        {wpx: 60},
+        {wpx: 90},
+        {wpx: 80},
+        {wpx: 90}
+    ];
+    data['!rows'] = [
+        {hpx:30},
+        {hpx:20},
+        {hpx:25}
+    ]
     wb.Sheets[ 'Sheet1' ] = data;
     saveAs ( new Blob ( [ s2ab ( XLSX.write ( wb, wopts ) ) ], { type : "application/octet-stream" } ), filename + '.' + (wopts.bookType == "biff2" ? "xls":wopts.bookType) );
 

@@ -71,7 +71,7 @@
                     if (valid) {
                         this.loading = true
                         this.$store.dispatch ( 'CheckUserLogin', this.loginForm ).then ( (response) => {
-                            // console.log(response);
+                            // // console.log(response);
                             if(response.status!=200){
                                 this.$message.error ( '请求失败，网络原因请重试！' );
                             }else {
@@ -87,7 +87,7 @@
                             this.loading = false
                         } )
                     } else {
-                        // console.log ( 'error submit!!' )
+                        // // console.log ( 'error submit!!' )
                         return false
                     }
                 } )

@@ -247,7 +247,7 @@
                 }
             },
             handleSubmit(formName){
-                console.log(this.addForm)
+                // console.log(this.addForm)
                 this.$refs[formName].validate((valid) => {
                     if (valid){
                         // this.addFormVisible = false;

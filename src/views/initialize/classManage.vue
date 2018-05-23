@@ -124,7 +124,7 @@
                                 this.$message.error('请求失败，服务器内部错误请重试或者联系开发者！');
                             }else{
                                 this.classMeaasge = res.data.data;
-                                // console.log(this.classMeaasge[0].)
+                                // // console.log(this.classMeaasge[0].)
                                 this.classMeaasge.forEach(element => {
                                     element.year = this.nowYear.year
                                 });
@@ -149,9 +149,9 @@
                             }else{
                                 this.tableData = res.data.data;
                                 // 获取一个当前初始化的年
-                                // console.log(this.tableData.length)
+                                // // console.log(this.tableData.length)
                                 this.nowYear.year = this.tableData[this.tableData.length - 1].graduateYear
-                                // console.log(this.nowYear.year)
+                                // // console.log(this.nowYear.year)
                             }
                         }
                     })

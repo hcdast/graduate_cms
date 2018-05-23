@@ -117,10 +117,10 @@ export default {
 
         },
         handleRemove(file, fileList) {
-            console.log(file, fileList);
+            // console.log(file, fileList);
         },
         handlePreview(file) {
-            console.log(file);
+            // console.log(file);
         },
         beforeRemove(file, fileList) {
             return this.$confirm(`确定移除 ${ file.name }？`);
@@ -136,8 +136,8 @@ export default {
                                 this.innerVisible2 = true;
                                 this.accountError = res.data.data[1];
                                 this.IDError = res.data.data[0]
-                                // console.log(this.accountError)
-                                // console.log(this.IDError)
+                                // // console.log(this.accountError)
+                                // // console.log(this.IDError)
                             }else{
                                 this.innerVisible1 = true;
                                 this.$message({
@@ -175,8 +175,8 @@ export default {
                                         if(!res.data||res.data.code !=0){
                                             this.$message.error('请求失败，服务器内部错误请重试或者联系开发者！');
                                         }else{
-                                            // console.log(res)
-                                            // console.log('添加操作记录成功')
+                                            // // console.log(res)
+                                            // // console.log('添加操作记录成功')
                                             location.reload();
                                         }}
                                })

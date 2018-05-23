@@ -169,7 +169,7 @@
                             }else{
                                 this.tableData = res.data.data;
                                 // 获取一个当前初始化的年
-                                // console.log(this.tableData.length)
+                                // // console.log(this.tableData.length)
                                 this.nowYear.year = this.tableData[this.tableData.length - 1].graduateYear
                             }
                         }

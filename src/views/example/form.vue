@@ -208,12 +208,12 @@ export default {
         this.postForm = response.data
       }).catch(err => {
         this.fetchSuccess = false
-        console.log(err)
+        // console.log(err)
       })
     },
     submitForm() {
       this.postForm.display_time = parseInt(this.display_time / 1000)
-      console.log(this.postForm)
+      // console.log(this.postForm)
       this.$refs.postForm.validate(valid => {
         if (valid) {
           this.loading = true
@@ -226,7 +226,7 @@ export default {
           this.postForm.status = 'published'
           this.loading = false
         } else {
-          console.log('error submit!!')
+          // console.log('error submit!!')
           return false
         }
       })
@@ -250,7 +250,7 @@ export default {
     getRemoteUserList(query) {
       userSearch(query).then(response => {
         if (!response.data.items) return
-        console.log(response)
+        // console.log(response)
         this.userLIstOptions = response.data.items.map(v => ({
           key: v.name
         }))
